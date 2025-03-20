@@ -1,7 +1,35 @@
-import 'package:fe_capstone/ui/screens/RegisterScreen1.dart';
+import 'package:fe_capstone/ui/CustomerUI/HomeScreen1.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen1 extends StatelessWidget {
+class LoginScreen1 extends StatefulWidget {
+  @override
+  _LoginScreen1State createState() => _LoginScreen1State();
+}
+
+class _LoginScreen1State extends State<LoginScreen1> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  final String fakeEmail = "test@gmail.com";
+  final String fakePassword = "123";
+
+  void _login() {
+    if (_emailController.text == fakeEmail &&
+        _passwordController.text == fakePassword) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen1()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Sai email hoặc mật khẩu!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +64,7 @@ class LoginScreen1 extends StatelessWidget {
               ),
               SizedBox(height: 20),
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: "Email",
                   border: OutlineInputBorder(
@@ -44,6 +73,7 @@ class LoginScreen1 extends StatelessWidget {
               ),
               SizedBox(height: 10),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Mật khẩu",
@@ -68,36 +98,12 @@ class LoginScreen1 extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25)),
                 ),
-                onPressed: () {},
+                onPressed: _login,
                 child: const Text("Đăng nhập",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold)),
-              ),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen1()),
-                  );
-                },
-                child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(color: Colors.black, fontSize: 14),
-                    children: [
-                      TextSpan(text: "Chưa có tài khoản? "),
-                      TextSpan(
-                        text: "Đăng kí",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),

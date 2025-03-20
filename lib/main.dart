@@ -1,6 +1,8 @@
 import 'package:fe_capstone/ui/ChatScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/BottomTabNavCustomer.dart';
+import 'package:fe_capstone/ui/CustomerUI/ContractScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/HomeScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/HomeScreen1.dart';
 import 'package:fe_capstone/ui/CustomerUI/VechicleScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/WalletScreen.dart';
 import 'package:fe_capstone/ui/PLOwnerUI/BottomTabNavPlo.dart';
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
       home: WelcomeScreen(),
       // home: LoginScreen1(),
       // home: RegisterScreen1(),
+      // home: ContractScreen()
+      // home: HomeScreen1(),
     );
   }
 }
