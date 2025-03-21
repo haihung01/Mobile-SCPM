@@ -1,5 +1,9 @@
-import 'package:fe_capstone/ui/CustomerUI/ContractScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/LocationScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/profile/ProfileScreen1.dart';
+import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
+import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
+// import 'package:fe_capstone/widgets/custom_footer.dart';
 
 class HomeScreen1 extends StatefulWidget {
   @override
@@ -21,29 +25,38 @@ class _HomeScreenState extends State<HomeScreen1> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Image.network(
-              "https://images.template.net/85586/free-car-parking-illustration-ql7jz.jpg",
-              height: 40,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+            },
+            child: const CircleAvatar(
+              backgroundImage: AssetImage("assets/images/profile1.webp"),
             ),
-            Text(
-              "SPCM",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            CircleAvatar(
-              backgroundImage: AssetImage("assets/profile.jpg"),
-            ),
-          ],
+          ),
         ),
+        title: const Text(
+          "SPCM",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: Icon(Icons.notifications_none, color: Colors.black),
+          ),
+        ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Expanded(
@@ -67,25 +80,12 @@ class _HomeScreenState extends State<HomeScreen1> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.green,
-        child: Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildNavItem(Icons.home, "Trang chủ", 0),
-              _buildNavItem(Icons.layers, "Hợp đồng", 1),
-              SizedBox(width: 40), // khoảng trống cho FAB
-              _buildNavItem(Icons.car_crash, "Quản lý xe", 3),
-              _buildNavItem(Icons.feedback_sharp, "Feedback", 2),
-            ],
-          ),
-        ),
+      bottomNavigationBar: CustomFooter(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
@@ -99,7 +99,15 @@ class _HomeScreenState extends State<HomeScreen1> {
           if (title == "Tìm Bãi Đỗ") {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ContractScreen()),
+              MaterialPageRoute(
+                  builder: (context) => LocationScreen()), // Giữ nguyên
+            );
+          } else if (title == "Hợp Đồng") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ContractScreen()), // Thêm chức năng hợp đồng
             );
           }
         },
@@ -107,26 +115,14 @@ class _HomeScreenState extends State<HomeScreen1> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 50, color: Colors.black54),
-            SizedBox(height: 10),
-            Text(title,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String title, int index) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: _selectedIndex == index ? Colors.green : Colors.grey),
-        Text(
-          title,
-          style: TextStyle(
-              color: _selectedIndex == index ? Colors.green : Colors.grey),
-        ),
-      ],
     );
   }
 }
