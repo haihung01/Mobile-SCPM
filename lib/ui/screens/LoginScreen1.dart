@@ -1,4 +1,4 @@
-import 'package:fe_capstone/ui/CustomerUI/HomeScreen1.dart';
+import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen1 extends StatefulWidget {

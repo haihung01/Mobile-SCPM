@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ContractScreen extends StatefulWidget {
+class LocationScreen extends StatefulWidget {
   @override
   _ContractScreenState createState() => _ContractScreenState();
 }
 
-class _ContractScreenState extends State<ContractScreen> {
+class _ContractScreenState extends State<LocationScreen> {
   TextEditingController _searchController = TextEditingController();
 
   @override
