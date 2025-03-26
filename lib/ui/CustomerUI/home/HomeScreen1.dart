@@ -1,6 +1,7 @@
 import 'package:fe_capstone/ui/CustomerUI/LocationScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/profile/ProfileScreen1.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleManagementScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
 // import 'package:fe_capstone/widgets/custom_footer.dart';
@@ -68,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen1> {
                   _buildCard(Icons.location_on_outlined, "Tìm Bãi Đỗ", context),
                   _buildCard(Icons.layers_outlined, "Hợp Đồng", context),
                   _buildCard(
-                      Icons.directions_car_outlined, "Thông Tin Xe", context),
+                      Icons.directions_car_outlined, "Danh sách xe", context),
                   _buildCard(Icons.notifications_active_outlined, "Thông Báo",
                       context),
                 ],
@@ -99,15 +100,17 @@ class _HomeScreenState extends State<HomeScreen1> {
           if (title == "Tìm Bãi Đỗ") {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => LocationScreen()), // Giữ nguyên
+              MaterialPageRoute(builder: (context) => LocationScreen()),
             );
           } else if (title == "Hợp Đồng") {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      ContractScreen()), // Thêm chức năng hợp đồng
+              MaterialPageRoute(builder: (context) => ContractScreen()),
+            );
+          } else if (title == "Danh sách xe") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => VehicleListScreen()),
             );
           }
         },

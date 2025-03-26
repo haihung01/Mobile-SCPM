@@ -5,6 +5,7 @@ import 'package:fe_capstone/ui/CustomerUI/HomeScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:fe_capstone/ui/CustomerUI/VechicleScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/WalletScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/parking-management/ListParkingScreen.dart';
 import 'package:fe_capstone/ui/PLOwnerUI/BottomTabNavPlo.dart';
 import 'package:fe_capstone/ui/PLOwnerUI/ContractExpiredScreen.dart';
 import 'package:fe_capstone/ui/PLOwnerUI/PloChatScreen.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color(0xFF6EC2F7)),
       home: WelcomeScreen(),
-      // home: LoginScreen1(),
+      // home: ListParkingScreen(),
       // home: RegisterScreen1(),
       // home: ContractScreen()
       // home: HomeScreen1(),

@@ -1,3 +1,4 @@
+import 'package:fe_capstone/ui/CustomerUI/payment/PaymentScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
 
@@ -12,21 +13,27 @@ class _ContractScreenState extends State<ContractScreen> {
   final List<Map<String, String>> contractList = [
     {
       "title": "Hợp Đồng Xe A",
-      "description": "Xe chạy tốt",
-      "location": "Bà Rịa-Vũng Tàu",
+      "description": "Kiểm tra sức khỏe",
+      "location": "Bs. Trịnh Ngọc Bảo",
       "image": "assets/images/car1.jpg",
+      "status": "Đã duyệt",
+      "button": "Thanh toán"
     },
     {
       "title": "Hợp Đồng Xe B",
-      "description": "Đang bảo trì",
-      "location": "Hồ Chí Minh",
+      "description": "Tiền cọc",
+      "location": "Bs. Đỗ Tài Nhân",
       "image": "assets/images/car2.webp",
+      "status": "Đang chờ duyệt",
+      "button": "Chi tiết"
     },
     {
       "title": "Hợp Đồng Xe C",
-      "description": "Chạy khỏe",
-      "location": "Bình Dương",
+      "description": "Nhận chăm sóc",
+      "location": "Bs. Cố Đỗ Số 7",
       "image": "assets/images/car1.jpg",
+      "status": "Đã duyệt",
+      "button": "Thanh toán"
     },
   ];
 
@@ -66,7 +73,7 @@ class _ContractScreenState extends State<ContractScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTabButton("Chưa Hợp Đồng", 0),
+                _buildTabButton("Chưa Thanh Toán", 0),
                 _buildTabButton("Đã thanh toán", 1),
               ],
             ),
@@ -75,11 +82,14 @@ class _ContractScreenState extends State<ContractScreen> {
               child: ListView.builder(
                 itemCount: contractList.length,
                 itemBuilder: (context, index) {
+                  final item = contractList[index];
                   return _buildContractCard(
-                    contractList[index]["title"]!,
-                    contractList[index]["description"]!,
-                    contractList[index]["location"]!,
-                    contractList[index]["image"]!,
+                    item["title"]!,
+                    item["description"]!,
+                    item["location"]!,
+                    item["image"]!,
+                    item["status"]!,
+                    item["button"]!,
                   );
                 },
               ),
@@ -130,7 +140,26 @@ class _ContractScreenState extends State<ContractScreen> {
 
   // Card Widget
   Widget _buildContractCard(
-      String title, String description, String location, String image) {
+    String title,
+    String description,
+    String location,
+    String image,
+    String status,
+    String buttonLabel,
+  ) {
+    Color statusColor;
+    switch (status) {
+      case 'Đã duyệt':
+        statusColor = Colors.green;
+        break;
+      case 'Đang chờ duyệt':
+        statusColor = Colors.orange;
+        break;
+
+      default:
+        statusColor = Colors.blueGrey;
+    }
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
@@ -171,19 +200,45 @@ class _ContractScreenState extends State<ContractScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.1),
+                      border: Border.all(color: statusColor),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: statusColor),
+                    ),
+                  ),
                 ],
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                if (buttonLabel.toLowerCase() == "chi tiết") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PaymentScreen()),
+                  );
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: const Text(
-                "Chi tiết",
-                style: TextStyle(color: Colors.white, fontSize: 14),
+              child: Text(
+                buttonLabel,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
           ],
