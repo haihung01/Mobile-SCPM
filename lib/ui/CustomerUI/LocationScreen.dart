@@ -10,7 +10,7 @@ class LocationScreen extends StatefulWidget {
   _ContractScreenState createState() => _ContractScreenState();
 }
 
-class _ContractScreenState extends State<ContractScreen> {
+class _ContractScreenState extends State<LocationScreen> {
   FocusNode _searchFocusNode = FocusNode();
   bool showSearchResults = false;
   VietmapController? _mapController;
@@ -19,6 +19,32 @@ class _ContractScreenState extends State<ContractScreen> {
   List<dynamic> autoSearchResults = [];
   late double lat;
   late double long;
+  late List<dynamic> parkingList = [
+    {
+      "ploID": "PLO000000002",
+      "parkingName": "Bãi xe Vincom Biên Hòa",
+      "address": "789 Park Street, City",
+      "distance": 0.012026901688146576,
+      "price": 10000,
+      "currentTime": "2025-03-24T20:15:19",
+      "slot": 30,
+      "longitude": 106.842994,
+      "latitude": 10.957718,
+      "price": 50000
+    },
+    {
+      "ploID": "PLO000000001",
+      "parkingName": "Bãi gửi xe Tiến Nghĩa",
+      "address": "456 Park Street, City",
+      "distance": 0.10433771397587333,
+      "price": 10000,
+      "currentTime": "2025-03-24T20:15:19",
+      "slot": 40,
+      "longitude": 106.843573,
+      "latitude": 10.958361,
+      "price": 1000000
+    }
+  ];
 
   late TextEditingController _searchController = TextEditingController();
 
@@ -84,7 +110,6 @@ class _ContractScreenState extends State<ContractScreen> {
   bool canPerformSearch = true;
 
   void performAutoSearch(String searchText) async {
-    double circleRadius = 200.0;
     String url =
         '${BaseConstants.VIETMAP_URL}/autocomplete/v3?apikey=${BaseConstants.VIET_MAP_APIKEY}&text=$searchText';
     try {
@@ -103,6 +128,100 @@ class _ContractScreenState extends State<ContractScreen> {
     }
   }
 
+  Marker _buildParkingMarker(dynamic parking) {
+    return Marker(
+      alignment: Alignment.bottomCenter,
+      width: 80,
+      height: 80,
+      child: GestureDetector(
+        onTap: () {
+          _showParkingInfoDialog(parking);
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              child: Icon(
+                Icons.local_parking_outlined,
+                color: Colors.green,
+                size: 40,
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+                )
+                ],
+              ),
+              child: Text(
+                parking['parkingName'],
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+      latLng: LatLng(
+        parking['latitude'] as double,
+        parking['longitude'] as double,
+      ),
+    );
+  }
+
+  void _showParkingInfoDialog(dynamic parking) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(parking['parkingName']),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInfoRow(Icons.location_on, parking['address']),
+              _buildInfoRow(Icons.attach_money, '${parking['price']} VND'),
+              _buildInfoRow(Icons.local_parking, '${parking['slot']} chỗ trống'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Đóng'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.blue),
+          SizedBox(width: 8),
+          Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+
   void getLatAndLong(String refId) async {
     String url =
         "${BaseConstants.VIETMAP_URL}/place/v3?apikey=${BaseConstants.VIET_MAP_APIKEY}&refid=$refId";
@@ -111,27 +230,40 @@ class _ContractScreenState extends State<ContractScreen> {
       var response = await dio.get(url);
       if (response.statusCode == 200) {
         var data = response.data;
-        setState(() async {
+        setState(() {
           lat = data['lat'];
           long = data['lng'];
           temp.clear();
-          _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-              CameraPosition(target: LatLng(lat, long), zoom: 17, tilt: 30)));
 
           temp.add(Marker(
-              alignment: Alignment.bottomCenter,
+            alignment: Alignment.bottomCenter,
+            width: 50,
+            height: 50,
+            child: Container(
               width: 50,
               height: 50,
-              child: Container(
-                width: 50,
-                height: 50,
-                child: Icon(
-                  Icons.location_on_outlined,
-                  color: Colors.red,
-                  size: 40,
-                ),
+              child: Icon(
+                Icons.location_on_outlined,
+                color: Colors.red,
+                size: 40,
               ),
-              latLng: LatLng(lat, long)));
+            ),
+            latLng: LatLng(lat, long),
+          ));
+
+          if (parkingList.isNotEmpty) {
+            for (var parking in parkingList) {
+              temp.add(_buildParkingMarker(parking));
+            }
+          }
+
+          _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+              CameraPosition(
+                  target: LatLng(lat, long),
+                  zoom: 17,
+                  tilt: 30
+              )
+          ));
         });
       } else {
         print('AutoSearch Request Failed with status: ${response.statusCode}');
@@ -188,19 +320,7 @@ class _ContractScreenState extends State<ContractScreen> {
               right: 0,
               bottom: 0,
               child: MarkerLayer(
-                ignorePointer: true,
-                mapController: _mapController!,
-                markers: [],
-              ),
-            ),
-          if (_mapController != null)
-            Positioned(
-              top: 200 * fem,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: MarkerLayer(
-                ignorePointer: true,
+                ignorePointer: false,
                 mapController: _mapController!,
                 markers: temp,
               ),
@@ -350,6 +470,9 @@ class _ContractScreenState extends State<ContractScreen> {
                         autoSearchResults[index]['ref_id'];
                         getLatAndLong(selectedResult);
                         FocusScope.of(context).requestFocus(FocusNode());
+                        setState(() {
+                          showSearchResults = false;
+                        });
                       },
                     );
                   },
@@ -383,7 +506,7 @@ class _ContractScreenState extends State<ContractScreen> {
                   _mapController?.animateCamera(CameraUpdate.newCameraPosition(
                       CameraPosition(
                           target: LatLng(value.latitude, value.longitude),
-                          zoom: 10,
+                          zoom: 17,
                           tilt: 60)));
                   temp.add(Marker(
                       alignment: Alignment.bottomCenter,
@@ -399,6 +522,12 @@ class _ContractScreenState extends State<ContractScreen> {
                         ),
                       ),
                       latLng: LatLng(value.latitude, value.longitude)));
+
+                  if (parkingList.isNotEmpty) {
+                    for (var parking in parkingList) {
+                      temp.add(_buildParkingMarker(parking));
+                    }
+                  }
                 });
               },
               child: Icon(
