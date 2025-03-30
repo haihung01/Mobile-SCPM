@@ -1,126 +1,203 @@
 import 'package:flutter/material.dart';
+import 'package:fe_capstone/models/car_model.dart';
+import 'package:fe_capstone/service/data_service.dart';
 
-class VehicleDetailsScreen extends StatelessWidget {
-  final String vehicleName;
-  final String vehiclePlate;
-  final String vehicleImage;
-  final String vehicleColor;
-  final String vehicleYear;
+class VehicleDetailsScreen extends StatefulWidget {
+  final int carId;
 
-  const VehicleDetailsScreen({
-    Key? key,
-    required this.vehicleName,
-    required this.vehiclePlate,
-    required this.vehicleImage,
-    required this.vehicleColor,
-    required this.vehicleYear,
-  }) : super(key: key);
+  const VehicleDetailsScreen({required this.carId, Key? key}) : super(key: key);
+
+  @override
+  _VehicleDetailsScreenState createState() => _VehicleDetailsScreenState();
+}
+
+class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
+  late Future<Car> _futureCar;
+  final DataService _dataService = DataService();
+  bool _isEditing = false;
+  final _formKey = GlobalKey<FormState>();
+  late Car _editableCar;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureCar = _dataService.getCarById(widget.carId);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.green,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Chi tiết hồ sơ",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        title: Text('Chi tiết xe'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.white),
-            onPressed: () {
-              // Chức năng sửa thông tin
+            icon: Icon(_isEditing ? Icons.save : Icons.edit),
+            onPressed: () async {
+              if (_isEditing) {
+                if (_formKey.currentState!.validate()) {
+                  setState(() {
+                    _isEditing = false;
+                  });
+                  try {
+                    final updatedCar = await _dataService.updateCar(_editableCar);
+                    setState(() {
+                      _futureCar = Future.value(updatedCar);
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Cập nhật thành công')),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Lỗi khi cập nhật: ${e.toString()}')),
+                    );
+                  }
+                }
+              } else {
+                setState(() {
+                  _isEditing = true;
+                });
+              }
             },
           ),
         ],
       ),
-      body: Column(
+      body: FutureBuilder<Car>(
+        future: _futureCar,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Lỗi tải chi tiết xe'));
+          } else if (!snapshot.hasData) {
+            return Center(child: Text('Không tìm thấy thông tin xe'));
+          }
+
+          final car = snapshot.data!;
+          if (_isEditing) {
+            _editableCar = Car(
+              carId: car.carId,
+              customerId: car.customerId,
+              model: car.model,
+              color: car.color,
+              licensePlate: car.licensePlate,
+              registedDate: car.registedDate,
+              status: car.status,
+              contracts: car.contracts,
+              customer: car.customer,
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: _isEditing
+                ? _buildEditForm(car)
+                : _buildDetailView(car),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDetailView(Car car) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Image.network(
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
+            height: 200,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Icon(Icons.car_repair, size: 100),
+          ),
+        ),
+        SizedBox(height: 20),
+        _buildDetailItem('Model', car.model),
+        _buildDetailItem('Biển số', car.licensePlate),
+        _buildDetailItem('Màu sắc', car.color),
+        _buildDetailItem('Ngày đăng ký', car.registedDate),
+        _buildDetailItem('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: Colors.black26),
-                  ),
-                ),
-                child: const Text("Thông tin"),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[200],
-                  foregroundColor: Colors.black54,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text("Sửa thông tin"),
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage(vehicleImage),
-          ),
-          const SizedBox(height: 20),
           Text(
-            vehicleName,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            label,
+            style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
           Text(
-            vehiclePlate,
-            style: const TextStyle(fontSize: 16, color: Colors.green),
+            value,
+            style: TextStyle(fontSize: 18),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildInfoCard("Màu", vehicleColor),
-              const SizedBox(width: 16),
-              _buildInfoCard("Năm Sản Xuất", vehicleYear),
-            ],
-          ),
+          Divider(),
         ],
       ),
     );
   }
 
-  Widget _buildInfoCard(String title, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.green),
-        borderRadius: BorderRadius.circular(12),
-      ),
+  Widget _buildEditForm(Car car) {
+    return Form(
+      key: _formKey,
       child: Column(
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-                fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),
+          TextFormField(
+            initialValue: car.model,
+            decoration: InputDecoration(labelText: 'Model'),
+            validator: (value) => value!.isEmpty ? 'Vui lòng nhập model' : null,
+            onChanged: (value) => _editableCar = _editableCar.copyWith(model: value),
           ),
-          const SizedBox(height: 5),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          TextFormField(
+            initialValue: car.licensePlate,
+            decoration: InputDecoration(labelText: 'Biển số'),
+            validator: (value) => value!.isEmpty ? 'Vui lòng nhập biển số' : null,
+            onChanged: (value) => _editableCar = _editableCar.copyWith(licensePlate: value),
+          ),
+          TextFormField(
+            initialValue: car.color,
+            decoration: InputDecoration(labelText: 'Màu sắc'),
+            validator: (value) => value!.isEmpty ? 'Vui lòng nhập màu sắc' : null,
+            onChanged: (value) => _editableCar = _editableCar.copyWith(color: value),
+          ),
+          SwitchListTile(
+            title: Text('Trạng thái hoạt động'),
+            value: _editableCar.status,
+            onChanged: (value) => setState(() {
+              _editableCar = _editableCar.copyWith(status: value);
+            }),
           ),
         ],
       ),
+    );
+  }
+}
+
+extension CarCopyWith on Car {
+  Car copyWith({
+    int? carId,
+    int? customerId,
+    String? model,
+    String? color,
+    String? licensePlate,
+    String? registedDate,
+    bool? status,
+    List<dynamic>? contracts,
+    dynamic customer,
+  }) {
+    return Car(
+      carId: carId ?? this.carId,
+      customerId: customerId ?? this.customerId,
+      model: model ?? this.model,
+      color: color ?? this.color,
+      licensePlate: licensePlate ?? this.licensePlate,
+      registedDate: registedDate ?? this.registedDate,
+      status: status ?? this.status,
+      contracts: contracts ?? this.contracts,
+      customer: customer ?? this.customer,
     );
   }
 }

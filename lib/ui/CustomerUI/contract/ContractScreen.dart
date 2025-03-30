@@ -8,7 +8,7 @@ class ContractScreen extends StatefulWidget {
 }
 
 class _ContractScreenState extends State<ContractScreen> {
-  int selectedTabIndex = 0; // 0 = "Chưa Hợp Đồng", 1 = "Đã thanh toán"
+  int selectedTabIndex = 0;
 
   final List<Map<String, String>> contractList = [
     {

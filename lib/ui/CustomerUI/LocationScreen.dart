@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/main.dart';
+import 'package:fe_capstone/models/parking_lot_model.dart';
+import 'package:fe_capstone/service/data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -19,32 +21,8 @@ class _ContractScreenState extends State<LocationScreen> {
   List<dynamic> autoSearchResults = [];
   late double lat;
   late double long;
-  late List<dynamic> parkingList = [
-    {
-      "ploID": "PLO000000002",
-      "parkingName": "Bãi xe Vincom Biên Hòa",
-      "address": "789 Park Street, City",
-      "distance": 0.012026901688146576,
-      "price": 10000,
-      "currentTime": "2025-03-24T20:15:19",
-      "slot": 30,
-      "longitude": 106.842994,
-      "latitude": 10.957718,
-      "price": 50000
-    },
-    {
-      "ploID": "PLO000000001",
-      "parkingName": "Bãi gửi xe Tiến Nghĩa",
-      "address": "456 Park Street, City",
-      "distance": 0.10433771397587333,
-      "price": 10000,
-      "currentTime": "2025-03-24T20:15:19",
-      "slot": 40,
-      "longitude": 106.843573,
-      "latitude": 10.958361,
-      "price": 1000000
-    }
-  ];
+  late List<ParkingLot> parkingList = [];
+  final DataService _dataService = DataService();
 
   late TextEditingController _searchController = TextEditingController();
 
@@ -52,6 +30,14 @@ class _ContractScreenState extends State<LocationScreen> {
   void initState() {
     super.initState();
     _searchFocusNode.addListener(_onFocusChange);
+    _loadParkingLots();
+  }
+
+  Future<void> _loadParkingLots() async {
+      final parkingLots = await _dataService.searchParkingLots();
+      setState(() {
+        parkingList = parkingLots;
+      });
   }
 
   @override
@@ -128,7 +114,7 @@ class _ContractScreenState extends State<LocationScreen> {
     }
   }
 
-  Marker _buildParkingMarker(dynamic parking) {
+  Marker _buildParkingMarker(ParkingLot parking) {
     return Marker(
       alignment: Alignment.bottomCenter,
       width: 80,
@@ -163,7 +149,7 @@ class _ContractScreenState extends State<LocationScreen> {
                 ],
               ),
               child: Text(
-                parking['parkingName'],
+                parking.address,
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -177,25 +163,26 @@ class _ContractScreenState extends State<LocationScreen> {
         ),
       ),
       latLng: LatLng(
-        parking['latitude'] as double,
-        parking['longitude'] as double,
+        parking.lat as double,
+        parking.long as double,
       ),
     );
   }
 
-  void _showParkingInfoDialog(dynamic parking) {
+  void _showParkingInfoDialog(ParkingLot parking) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(parking['parkingName']),
+        title: Text(parking.address),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInfoRow(Icons.location_on, parking['address']),
-              _buildInfoRow(Icons.attach_money, '${parking['price']} VND'),
-              _buildInfoRow(Icons.local_parking, '${parking['slot']} chỗ trống'),
+              _buildInfoRow(Icons.location_on, parking.address),
+              _buildInfoRow(Icons.attach_money, 'Giá theo giờ; ${parking.pricePerHour} VND'),
+              _buildInfoRow(Icons.attach_money, 'Giá theo ngày: ${parking.pricePerDay} VND'),
+              _buildInfoRow(Icons.attach_money, 'Giá theo tháng: ${parking.pricePerMonth} VND'),
             ],
           ),
         ),
