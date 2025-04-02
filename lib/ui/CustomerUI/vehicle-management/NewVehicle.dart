@@ -10,6 +10,9 @@ class NewVehicleScreen extends StatefulWidget {
 }
 
 class _NewVehicleScreenState extends State<NewVehicleScreen> {
+  final TextEditingController _brandController =
+      TextEditingController(text: "");
+
   final DataService _dataService = DataService();
   File? _image;
   final _formKey = GlobalKey<FormState>();
@@ -27,7 +30,8 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   final List<String> _brands = ["BMW", "Mercedes", "Toyota", "Honda", "Ford"];
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -42,7 +46,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
         final newCar = Car(
           carId: 0, // Will be assigned by server
           customerId: 1, // Temporary hardcoded customerId
-          model: '${_selectedBrand} ${_modelController.text}',
+          model: '${_brandController.text} ${_modelController.text}',
           color: _colorController.text,
           licensePlate: _plateController.text,
           registedDate: _dateController.text,
@@ -103,32 +107,39 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                     ),
                     child: _image == null
                         ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_alt, size: 100, color: Colors.grey),
-                        const SizedBox(height: 8),
-                        const Text(
-                          "Chọn hình ảnh",
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    )
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.camera_alt,
+                                  size: 100, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Chọn hình ảnh",
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          )
                         : ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(_image!, fit: BoxFit.cover),
-                    ),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(_image!, fit: BoxFit.cover),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 30),
 
                 // Brand Dropdown
-                _buildDropdownField("Hãng xe", _selectedBrand, (value) {
-                  setState(() {
-                    _selectedBrand = value!;
-                  });
-                }, _brands),
+                _buildTextField(
+                  "Hãng xe",
+                  _brandController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập hãng xe';
+                    }
+                    return null;
+                  },
+                ),
+
                 const SizedBox(height: 20),
 
                 // Model TextField
@@ -243,12 +254,12 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   }
 
   Widget _buildTextField(
-      String label,
-      TextEditingController controller, {
-        int maxLines = 1,
-        String? hintText,
-        String? Function(String?)? validator,
-      }) {
+    String label,
+    TextEditingController controller, {
+    int maxLines = 1,
+    String? hintText,
+    String? Function(String?)? validator,
+  }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -262,11 +273,11 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   }
 
   Widget _buildDropdownField(
-      String label,
-      String value,
-      ValueChanged<String?> onChanged,
-      List<String> items,
-      ) {
+    String label,
+    String value,
+    ValueChanged<String?> onChanged,
+    List<String> items,
+  ) {
     return DropdownButtonFormField<String>(
       value: value,
       items: items.map((brand) {

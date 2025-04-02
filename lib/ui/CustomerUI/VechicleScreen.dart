@@ -42,7 +42,7 @@ class _VehicleScreenState extends State<VehicleScreen> {
         child: Container(
           margin: EdgeInsets.only(top: 20),
           child: Column(
-            crossAxisAlignment:  CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListView.builder(
                 shrinkWrap: true,
@@ -54,27 +54,25 @@ class _VehicleScreenState extends State<VehicleScreen> {
                 },
               ),
               InkWell(
-                onTap: (){
+                onTap: () {
                   _showAddVehicleDialog(context);
                 },
                 child: Container(
                   margin: EdgeInsets.only(left: 20, top: 20),
-                  width:  138*fem,
-                  height:  42*fem,
-                  decoration:  BoxDecoration (
-                    color:  Theme.of(context).primaryColor,
-                    borderRadius:  BorderRadius.circular(9*fem),
+                  width: 138 * fem,
+                  height: 42 * fem,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(9 * fem),
                   ),
-                  child:
-                  Center(
-                    child:
-                    Text(
+                  child: Center(
+                    child: Text(
                       'Thêm xe',
-                      style:  TextStyle (
-                        fontSize:  16*ffem,
-                        fontWeight:  FontWeight.w600,
-                        height:  1.175*ffem/fem,
-                        color:  Color(0xffffffff),
+                      style: TextStyle(
+                        fontSize: 16 * ffem,
+                        fontWeight: FontWeight.w600,
+                        height: 1.175 * ffem / fem,
+                        color: Color(0xffffffff),
                       ),
                     ),
                   ),
@@ -86,7 +84,6 @@ class _VehicleScreenState extends State<VehicleScreen> {
       ),
     );
   }
-
 
   Future<void> _showAddVehicleDialog(BuildContext context) async {
     await showDialog(
@@ -202,5 +199,4 @@ class _VehicleScreenState extends State<VehicleScreen> {
       },
     );
   }
-
 }

@@ -27,36 +27,34 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: Text('Chi tiết xe'),
+        title:
+            Text('Thông tin xe', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.green.shade700,
         actions: [
           IconButton(
-            icon: Icon(_isEditing ? Icons.save : Icons.edit),
+            icon: Icon(_isEditing ? Icons.check : Icons.edit),
             onPressed: () async {
               if (_isEditing) {
                 if (_formKey.currentState!.validate()) {
-                  setState(() {
-                    _isEditing = false;
-                  });
+                  setState(() => _isEditing = false);
                   try {
-                    final updatedCar = await _dataService.updateCar(_editableCar);
-                    setState(() {
-                      _futureCar = Future.value(updatedCar);
-                    });
+                    final updatedCar =
+                        await _dataService.updateCar(_editableCar);
+                    setState(() => _futureCar = Future.value(updatedCar));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Cập nhật thành công')),
                     );
                   } catch (e) {
-                      print('Lỗi khi cập nhật: ${e.toString()}');
+                    print('Lỗi khi cập nhật: ${e.toString()}');
                   }
                 }
               } else {
-                setState(() {
-                  _isEditing = true;
-                });
+                setState(() => _isEditing = true);
               }
             },
-          ),
+          )
         ],
       ),
       body: FutureBuilder<Car>(
@@ -65,31 +63,40 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Lỗi tải chi tiết xe'));
+            return Center(child: Text('Lỗi khi tải dữ liệu'));
           } else if (!snapshot.hasData) {
-            return Center(child: Text('Không tìm thấy thông tin xe'));
+            return Center(child: Text('Không tìm thấy xe'));
           }
 
           final car = snapshot.data!;
           if (_isEditing) {
-            _editableCar = Car(
-              carId: car.carId,
-              customerId: car.customerId,
-              model: car.model,
-              color: car.color,
-              licensePlate: car.licensePlate,
-              registedDate: car.registedDate,
-              status: car.status,
-              contracts: car.contracts,
-              customer: car.customer,
-            );
+            _editableCar = car.copyWith();
           }
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
-            child: _isEditing
-                ? _buildEditForm(car)
-                : _buildDetailView(car),
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
+                      height: 200,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Icon(Icons.directions_car, size: 100),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  child: _isEditing ? _buildEditForm() : _buildDetailView(car),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -98,77 +105,66 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   Widget _buildDetailView(Car car) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Center(
-          child: Image.network(
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
-            height: 200,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Icon(Icons.car_repair, size: 100),
-          ),
-        ),
-        SizedBox(height: 20),
-        _buildDetailItem('Model', car.model),
-        _buildDetailItem('Biển số', car.licensePlate),
-        _buildDetailItem('Màu sắc', car.color),
-        _buildDetailItem('Ngày đăng ký', car.registedDate),
-        _buildDetailItem('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
+        _infoTile('Model', car.model),
+        _infoTile('Biển số', car.licensePlate),
+        _infoTile('Màu sắc', car.color),
+        _infoTile('Ngày đăng ký', car.registedDate),
+        _infoTile('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
       ],
     );
   }
 
-  Widget _buildDetailItem(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+  Widget _infoTile(String label, String value) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 6),
+      child: ListTile(
+        title: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(value),
+      ),
+    );
+  }
+
+  Widget _buildEditForm() {
+    return Form(
+      key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+          _textField('Model', _editableCar.model,
+              (value) => _editableCar = _editableCar.copyWith(model: value)),
+          _textField(
+              'Biển số',
+              _editableCar.licensePlate,
+              (value) =>
+                  _editableCar = _editableCar.copyWith(licensePlate: value)),
+          _textField('Màu sắc', _editableCar.color,
+              (value) => _editableCar = _editableCar.copyWith(color: value)),
+          SwitchListTile(
+            title: Text('Trạng thái hoạt động'),
+            value: _editableCar.status,
+            onChanged: (value) => setState(
+                () => _editableCar = _editableCar.copyWith(status: value)),
           ),
-          Text(
-            value,
-            style: TextStyle(fontSize: 18),
-          ),
-          Divider(),
         ],
       ),
     );
   }
 
-  Widget _buildEditForm(Car car) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            initialValue: car.model,
-            decoration: InputDecoration(labelText: 'Model'),
-            validator: (value) => value!.isEmpty ? 'Vui lòng nhập model' : null,
-            onChanged: (value) => _editableCar = _editableCar.copyWith(model: value),
-          ),
-          TextFormField(
-            initialValue: car.licensePlate,
-            decoration: InputDecoration(labelText: 'Biển số'),
-            validator: (value) => value!.isEmpty ? 'Vui lòng nhập biển số' : null,
-            onChanged: (value) => _editableCar = _editableCar.copyWith(licensePlate: value),
-          ),
-          TextFormField(
-            initialValue: car.color,
-            decoration: InputDecoration(labelText: 'Màu sắc'),
-            validator: (value) => value!.isEmpty ? 'Vui lòng nhập màu sắc' : null,
-            onChanged: (value) => _editableCar = _editableCar.copyWith(color: value),
-          ),
-          SwitchListTile(
-            title: Text('Trạng thái hoạt động'),
-            value: _editableCar.status,
-            onChanged: (value) => setState(() {
-              _editableCar = _editableCar.copyWith(status: value);
-            }),
-          ),
-        ],
+  Widget _textField(
+      String label, String initialValue, Function(String) onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        initialValue: initialValue,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        validator: (value) =>
+            value == null || value.isEmpty ? 'Không được bỏ trống' : null,
+        onChanged: onChanged,
       ),
     );
   }
