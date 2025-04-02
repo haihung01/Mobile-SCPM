@@ -266,7 +266,7 @@ class _EditParkingInformationState extends State<EditParkingInformation> {
                       height: fem * 40, // Đặt chiều cao của nút
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
+                          backgroundColor: Colors.white,
                         ),
                         onPressed: () async {
                           final ImagePicker picker = ImagePicker();

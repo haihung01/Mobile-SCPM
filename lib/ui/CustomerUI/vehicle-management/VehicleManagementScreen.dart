@@ -1,158 +1,188 @@
+import 'package:fe_capstone/models/car_model.dart';
+import 'package:flutter/material.dart';
+import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/NewVehicle.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleDetailScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
-import 'package:flutter/material.dart';
 
-class VehicleListScreen extends StatelessWidget {
-  final List<Map<String, String>> vehicles = [
-    {
-      "name": "BMW 320i",
-      "plate": "59A-123.45",
-      "image": "assets/images/car1.jpg",
-      "color": "xanh nhạt",
-      "year": "2025"
-    },
-    {
-      "name": "Mercedes C200",
-      "plate": "59A-567.89",
-      "image": "assets/images/car2.webp",
-      "color": "trắng",
-      "year": "2023"
-    },
-  ];
+class VehicleListScreen extends StatefulWidget {
+  @override
+  _VehicleListScreenState createState() => _VehicleListScreenState();
+}
+
+class _VehicleListScreenState extends State<VehicleListScreen> {
+  final DataService _dataService = DataService();
+  late Future<List<Car>> _futureVehicles;
+  final int customerId = 1; // Replace with actual customer ID
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVehicles();
+  }
+
+  void _loadVehicles() {
+    setState(() {
+      _futureVehicles = _dataService.getCarsOfCustomer(customerId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Danh Sách Xe",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundImage: AssetImage("assets/images/profile1.webp"),
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.82,
-          ),
-          itemCount: vehicles.length + 1,
-          itemBuilder: (context, index) {
-            if (index < vehicles.length) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VehicleDetailsScreen(
-                        vehicleName: vehicles[index]["name"]!,
-                        vehiclePlate: vehicles[index]["plate"]!,
-                        vehicleImage: vehicles[index]["image"]!,
-                        vehicleColor: vehicles[index]["color"]!,
-                        vehicleYear: vehicles[index]["year"]!,
-                      ),
-                    ),
-                  );
-                },
-                child: _buildVehicleCard(
-                  vehicles[index]["image"]!,
-                  vehicles[index]["name"]!,
-                  vehicles[index]["plate"]!,
-                ),
-              );
-            } else {
-              return _buildAddCarCard(context);
-            }
-          },
-        ),
+      appBar: _buildAppBar(),
+      body: FutureBuilder<List<Car>>(
+        future: _futureVehicles,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Lỗi tải danh sách xe'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('Không có xe nào'));
+          }
+          return _buildVehicleGrid(snapshot.data!);
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => _navigateToAddVehicle(context),
         backgroundColor: Colors.green,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: CustomFooter(
-        selectedIndex: 2,
-        onItemTapped: (index) {},
+      bottomNavigationBar: CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: Colors.white,
+      title: const Text(
+        "Danh Sách Xe",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.menu, color: Colors.black),
+        onPressed: () {},
+      ),
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: 16),
+          child: CircleAvatar(
+            backgroundImage: AssetImage("assets/images/profile1.webp"),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVehicleGrid(List<Car> vehicles) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.82,
+        ),
+        itemCount: vehicles.length + 1,
+        itemBuilder: (context, index) {
+          if (index < vehicles.length) {
+            return _buildVehicleCard(context, vehicles[index]);
+          }
+          return _buildAddCard(context);
+        },
       ),
     );
   }
 
-  Widget _buildVehicleCard(String image, String name, String plate) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(image,
-                  height: 138, width: double.infinity, fit: BoxFit.cover),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              name,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              "🚗 Biển Số: $plate",
-              style: const TextStyle(color: Colors.black54),
-            ),
-          ],
+  Widget _buildVehicleCard(BuildContext context, Car vehicle) {
+    return GestureDetector(
+      onTap: () => _navigateToDetail(context, vehicle.carId),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
+                  height: 138,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 138,
+                    color: Colors.grey[200],
+                    child: Icon(Icons.car_repair, size: 50),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Center(
+                child: Text(
+                  "${vehicle.model} ${vehicle.color}",
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                "🚗 Biển Số: ${vehicle.licensePlate}",
+                style: const TextStyle(color: Colors.black54),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAddCarCard(BuildContext context) {
+  Widget _buildAddCard(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => NewVehicleScreen()),
-          );
-        },
+        onTap: () => _navigateToAddVehicle(context),
         child: const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.add, size: 30, color: Colors.black54),
               SizedBox(height: 8),
-              Text("Thêm Xe",
-                  style: TextStyle(fontSize: 16, color: Colors.black54)),
+              Text("Thêm Xe", style: TextStyle(fontSize: 16, color: Colors.black54)),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _navigateToDetail(BuildContext context, int carId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VehicleDetailsScreen(carId: carId),
+      ),
+    ).then((_) => _loadVehicles()); // Refresh list after returning
+  }
+
+  void _navigateToAddVehicle(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NewVehicleScreen()),
+    ).then((_) => _loadVehicles()); // Refresh list after adding
   }
 }

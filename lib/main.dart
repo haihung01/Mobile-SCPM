@@ -2,6 +2,7 @@ import 'package:fe_capstone/ui/ChatScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/BottomTabNavCustomer.dart';
 import 'package:fe_capstone/ui/CustomerUI/LocationScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/HomeScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:fe_capstone/ui/CustomerUI/VechicleScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/WalletScreen.dart';
@@ -38,10 +39,10 @@ class MyApp extends StatelessWidget {
       title: 'Capstone Project',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color(0xFF6EC2F7)),
-      home: WelcomeScreen(),
-      // home: ListParkingScreen(),
+      // home: WelcomeScreen(),
+      home: ListParkingScreen(),
       // home: RegisterScreen1(),
-      // home: ContractScreen()
+      // home: ContractScreen(),
       // home: HomeScreen1(),
     );
   }

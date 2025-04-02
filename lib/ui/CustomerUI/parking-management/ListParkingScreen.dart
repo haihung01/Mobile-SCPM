@@ -8,6 +8,7 @@ class ListParkingScreen extends StatefulWidget {
 
 class _ListParkingScreenState extends State<ListParkingScreen> {
   String? selectedCar = 'oto 1';
+
   String? selectedParking;
   DateTime selectedDate = DateTime(2023, 9, 15);
   final String totalCost = '100,000đ';
@@ -194,7 +195,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
   }
 
   void _onSubmit() {
-    if (selectedCar != null && selectedParking != null) {
+    if (selectedCar != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Hợp đồng đã được gửi!")),
       );
