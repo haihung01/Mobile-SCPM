@@ -81,16 +81,25 @@ class DataService {
 
   Future<Car> updateCar(Car car) async {
     try {
+      print("🚀 Đang gửi request cập nhật xe...");
+      print("📝 Dữ liệu trước khi gửi: ${car.toJson()}");
+
       final response = await _dio.put(
         '${BaseConstants.BASE_URL}/Car/Update',
         data: car.toJson(),
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
+
+      print("✅ Phản hồi từ server: ${response.data}");
+
       return Car.fromJson(response.data);
-    } catch (e) {
+    } catch (e, stacktrace) {
+      print("❌ Lỗi khi cập nhật xe: ${e.toString()}");
+      print("🔍 Stacktrace: $stacktrace");
       throw Exception('Error updating car: ${e.toString()}');
     }
   }
+
 
   Future<Car> addCar(Car car) async {
     try {

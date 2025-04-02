@@ -47,9 +47,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       SnackBar(content: Text('Cập nhật thành công')),
                     );
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Lỗi cập nhật: ${e.toString()}')),
-                    );
+                    print('Lỗi khi cập nhật: ${e.toString()}');
                   }
                 }
               } else {
