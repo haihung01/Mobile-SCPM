@@ -1,3 +1,4 @@
+import 'package:fe_capstone/ui/CustomerUI/contract/ContractDetailScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/payment/PaymentScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
@@ -222,11 +223,17 @@ class _ContractScreenState extends State<ContractScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (buttonLabel.toLowerCase() == "chi tiết") {
+                if (buttonLabel.toLowerCase() == "thanh toán") {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const PaymentScreen()),
+                  );
+                } else if (buttonLabel.toLowerCase() == "chi tiết") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ContractDetailScreen()),
                   );
                 }
               },

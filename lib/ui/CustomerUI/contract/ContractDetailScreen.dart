@@ -1,12 +1,13 @@
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
 import 'package:flutter/material.dart';
 
-class ListParkingScreen extends StatefulWidget {
+class ContractDetailScreen extends StatefulWidget {
   @override
-  _ListParkingScreenState createState() => _ListParkingScreenState();
+  _ListContractDetailScreenState createState() =>
+      _ListContractDetailScreenState();
 }
 
-class _ListParkingScreenState extends State<ListParkingScreen> {
+class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   String? selectedCar = 'oto 1';
 
   String? selectedParking;
@@ -26,7 +27,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
         ),
         centerTitle: true,
         title: Text(
-          'Soạn hợp đồng',
+          'Hợp đồng xe B',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
@@ -137,24 +138,6 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
 
             // Danh sách bãi xe
             _buildParkingCard("Bãi Xe A", "status: trống 10 chỗ"),
-            _buildParkingCard("Bãi Xe B", "Mô tả"),
-            _buildParkingCard("Bãi Xe C", "Mô tả"),
-
-            SizedBox(height: 24),
-
-            // Gửi button
-            SizedBox(
-              width: 190,
-              height: 40,
-              child: ElevatedButton(
-                onPressed: _onSubmit,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18))),
-                child: Text("Gửi", style: TextStyle(fontSize: 18)),
-              ),
-            ),
           ],
         ),
       ),
@@ -202,20 +185,6 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                selectedParking = title;
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              minimumSize: Size(60, 36),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-            ),
-            child: Text("chọn"),
-          )
         ],
       ),
     );
