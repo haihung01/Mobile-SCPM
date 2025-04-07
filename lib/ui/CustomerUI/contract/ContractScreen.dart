@@ -35,9 +35,12 @@ class _ContractScreenState extends State<ContractScreen> {
         final approvedContracts = await _dataService.getApprovedContracts();
         final rejectedContracts = await _dataService.getRejectedContracts();
         return [...pendingContracts, ...approvedContracts, ...rejectedContracts];
-      } else {
+      } else if (tabIndex == 1) {
         // "Đã Thanh Toán" tab
         return await _dataService.getPaidContracts();
+      } else {
+        // "Đang Hoạt Động" tab
+        return await _dataService.getActivatedContracts();
       }
     } catch (e) {
       throw Exception('Failed to load contracts: ${e.toString()}');
@@ -82,6 +85,7 @@ class _ContractScreenState extends State<ContractScreen> {
               children: [
                 _buildTabButton("Chưa Thanh Toán", 0),
                 _buildTabButton("Đã Thanh Toán", 1),
+                _buildTabButton("Đang Hoạt Động", 2),
               ],
             ),
             const SizedBox(height: 16),
@@ -278,6 +282,8 @@ class _ContractScreenState extends State<ContractScreen> {
         return 'Từ chối';
       case 'Paid':
         return 'Đã thanh toán';
+      case 'Activated':
+        return 'Đang hoạt động';
       default:
         return status;
     }
@@ -293,6 +299,8 @@ class _ContractScreenState extends State<ContractScreen> {
         return Colors.red; // Đỏ
       case 'Paid':
         return Colors.purple;
+      case 'Activated':
+        return Colors.blue; // You can change this color if needed
       default:
         return Colors.grey;
     }

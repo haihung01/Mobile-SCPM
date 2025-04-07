@@ -1,6 +1,13 @@
 import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class UrlConstant {
+  static const GOOGLE_MAPS_GEO = 'geo:';
+  static const GOOGLE_MAPS_APP = 'google.navigation:q=';
+  static const GOOGLE_MAPS_WEB = 'https://www.google.com/maps/search/?api=1&query=';
+}
 
 class ContractDetailScreen extends StatefulWidget {
   final Contract contract;
@@ -23,10 +30,61 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   }
 
   String get totalCost {
-    // if (widget.contract.paymentContract != null) {
-    //   return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
-    // }
     return 'Chưa có thông tin thanh toán';
+  }
+
+  Future<void> _openMap(double lat, double long) async {
+    // Try different URL schemes in order of preference
+    final String geoUrl = '${UrlConstant.GOOGLE_MAPS_GEO}$lat,$long';
+    final String googleMapsAppUrl = '${UrlConstant.GOOGLE_MAPS_APP}$lat,$long';
+    final String googleMapsWebUrl = '${UrlConstant.GOOGLE_MAPS_WEB}$lat,$long';
+
+    final Uri geoUri = Uri.parse(geoUrl);
+    final Uri googleMapsAppUri = Uri.parse(googleMapsAppUrl);
+    final Uri googleMapsWebUri = Uri.parse(googleMapsWebUrl);
+
+    try {
+      // Try the geo: scheme first (works on both Android and iOS)
+      print('Trying geo URL: $geoUrl');
+      if (await canLaunchUrl(geoUri)) {
+        print('Launching geo URL...');
+        await launchUrl(
+          geoUri,
+          mode: LaunchMode.externalApplication,
+        );
+        print('Geo URL launched successfully');
+        return;
+      }
+
+      // Try the Google Maps app URL
+      print('Geo URL not available, trying Google Maps app URL: $googleMapsAppUrl');
+      if (await canLaunchUrl(googleMapsAppUri)) {
+        print('Launching Google Maps app...');
+        await launchUrl(
+          googleMapsAppUri,
+          mode: LaunchMode.externalApplication,
+        );
+        print('Google Maps app launched successfully');
+        return;
+      }
+
+      // Fallback to web URL
+      print('Google Maps app not available, falling back to web URL: $googleMapsWebUrl');
+      if (await canLaunchUrl(googleMapsWebUri)) {
+        print('Launching web URL...');
+        await launchUrl(
+          googleMapsWebUri,
+          mode: LaunchMode.externalApplication,
+        );
+        print('Web URL launched successfully');
+      } else {
+        throw 'Không tìm thấy ứng dụng để mở bản đồ';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$e")),
+      );
+    }
   }
 
   @override
@@ -73,7 +131,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   ),
                   SizedBox(height: 12),
                   _buildInfoRow("Mã hợp đồng:", widget.contract.contractId.toString()),
-                  _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.note)),
+                  _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.status)),
                 ],
               ),
             ),
@@ -104,11 +162,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   _buildInfoRow("Từ ngày:", _formatDate(widget.contract.startDate)),
                   _buildInfoRow("Đến ngày:", _formatDate(widget.contract.endDate)),
                   SizedBox(height: 8),
-                  // if (widget.contract.paymentContract != null) ...[
-                  //   Divider(height: 24, thickness: 1),
-                  //   _buildInfoRow("Trạng thái thanh toán:",
-                  //       _getPaymentStatusText(widget.contract.paymentContract!.status)),
-                  // ],
                 ],
               ),
             ),
@@ -133,7 +186,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   ),
                   SizedBox(height: 12),
                   _buildInfoRow("Biển số:", widget.contract.car.licensePlate),
-                  _buildInfoRow("Màu sắc:", widget.contract.car.color),
+                  _buildInfoRow("Màu sắc:", widget.contract.car.color ?? 'Không có thông tin'),
                   _buildInfoRow("Model:", widget.contract.car.model),
                   Divider(height: 24, thickness: 1),
                   Row(
@@ -159,6 +212,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               widget.contract.parkingLotName,
               widget.contract.parkingLotAddress,
               widget.contract.parkingSpaceName,
+              widget.contract.lat,
+              widget.contract.long,
             ),
           ],
         ),
@@ -184,7 +239,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
     );
   }
 
-  Widget _buildParkingCard(String title, String address, String space) {
+  Widget _buildParkingCard(String title, String address, String space, double lat, double long) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -236,6 +291,21 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               ],
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.directions, color: Colors.blue, size: 30),
+            onPressed: () async {
+              try {
+                await _openMap(lat, long);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
         ],
       ),
     );
@@ -249,12 +319,16 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
 
   String _getStatusText(String status) {
     switch (status) {
-      case 'Waiting':
+      case 'Pending':
         return 'Chờ duyệt';
-      case 'Active':
+      case 'Approved':
+        return 'Đã duyệt';
+      case 'Rejected':
+        return 'Từ chối';
+      case 'Paid':
+        return 'Đã thanh toán';
+      case 'Activated':
         return 'Đang hoạt động';
-      case 'Expired':
-        return 'Đã kết thúc';
       default:
         return status;
     }
