@@ -12,6 +12,7 @@ class _LoginScreen1State extends State<LoginScreen1> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final DataService _dataService = DataService();
+  bool _obscurePassword = true;
 
   Future<void> _login() async {
     try {
@@ -29,11 +30,20 @@ class _LoginScreen1State extends State<LoginScreen1> {
         MaterialPageRoute(builder: (context) => HomeScreen1()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Lỗi"),
+            content: Text("Đăng nhập thất bại. Vui lòng thử lại."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("Thử lại"),
+              ),
+            ],
+          );
+        },
       );
     }
   }
@@ -82,11 +92,24 @@ class _LoginScreen1State extends State<LoginScreen1> {
               SizedBox(height: 10),
               TextField(
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: "Mật khẩu",
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
               ),
               Align(
