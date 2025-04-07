@@ -254,11 +254,6 @@ class _ContractScreenState extends State<LocationScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context); // đóng BottomSheet trước
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ListParkingScreen()),
-                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade600,
@@ -268,7 +263,7 @@ class _ContractScreenState extends State<LocationScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text("Xem chi tiết", style: TextStyle(fontSize: 15)),
+                  child: Text("Đóng", style: TextStyle(fontSize: 15)),
                 ),
               ),
             ],

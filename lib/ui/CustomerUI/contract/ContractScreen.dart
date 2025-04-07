@@ -18,7 +18,32 @@ class _ContractScreenState extends State<ContractScreen> {
   @override
   void initState() {
     super.initState();
-    futureContracts = _dataService.getCustomerContracts();
+    _loadContracts();
+  }
+
+  void _loadContracts() {
+    setState(() {
+      futureContracts = _fetchContractsForTab(selectedTabIndex);
+    });
+  }
+
+  Future<List<Contract>> _fetchContractsForTab(int tabIndex) async {
+    try {
+      switch (tabIndex) {
+        case 0: // Pending
+          return await _dataService.getPendingContracts();
+        case 1: // Approved
+          return await _dataService.getApprovedContracts();
+        case 2: // Paid
+          return await _dataService.getPaidContracts();
+        case 3: // Activated
+          return await _dataService.getActivatedContracts();
+        default:
+          return [];
+      }
+    } catch (e) {
+      throw Exception('Failed to load contracts: ${e.toString()}');
+    }
   }
 
   @override
@@ -58,8 +83,9 @@ class _ContractScreenState extends State<ContractScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTabButton("Chờ duyệt", 0),
-                _buildTabButton("Đang hoạt động", 1),
-                _buildTabButton("Đã hoàn thành", 2),
+                _buildTabButton("Đã duyệt", 1),
+                _buildTabButton("Đang hoạt động", 3),
+                _buildTabButton("Đã thanh toán", 2),
               ],
             ),
             const SizedBox(height: 16),
@@ -75,12 +101,10 @@ class _ContractScreenState extends State<ContractScreen> {
                     return const Center(child: Text('Không có hợp đồng nào'));
                   } else {
                     final contracts = snapshot.data!;
-                    final filteredContracts = _filterContracts(contracts);
-
                     return ListView.builder(
-                      itemCount: filteredContracts.length,
+                      itemCount: contracts.length,
                       itemBuilder: (context, index) {
-                        final contract = filteredContracts[index];
+                        final contract = contracts[index];
                         return _buildContractCard(contract);
                       },
                     );
@@ -104,29 +128,17 @@ class _ContractScreenState extends State<ContractScreen> {
     );
   }
 
-  List<Contract> _filterContracts(List<Contract> contracts) {
-    switch (selectedTabIndex) {
-      case 0: // Waiting
-        return contracts.where((c) => c.currentStatus == 'Waiting').toList();
-      case 1: // Active
-        return contracts.where((c) => c.currentStatus == 'Active').toList();
-      case 2: // Expired
-        return contracts.where((c) => c.currentStatus == 'Expired').toList();
-      default:
-        return [];
-    }
-  }
-
   Widget _buildTabButton(String text, int index) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
           setState(() {
             selectedTabIndex = index;
+            _loadContracts();
           });
         },
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: selectedTabIndex == index ? Colors.green : Colors.grey[200],
@@ -137,7 +149,7 @@ class _ContractScreenState extends State<ContractScreen> {
             text,
             style: TextStyle(
               color: selectedTabIndex == index ? Colors.white : Colors.black,
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -147,8 +159,8 @@ class _ContractScreenState extends State<ContractScreen> {
   }
 
   Widget _buildContractCard(Contract contract) {
-    final statusText = _getStatusText(contract.currentStatus);
-    final statusColor = _getStatusColor(contract.currentStatus);
+    final statusText = _getStatusText(contract.status);
+    final statusColor = _getStatusColor(contract.status);
     final buttonLabel = _getButtonLabel(contract);
 
     return Card(
@@ -273,12 +285,14 @@ class _ContractScreenState extends State<ContractScreen> {
 
   String _getStatusText(String status) {
     switch (status) {
-      case 'Waiting':
+      case 'Pending':
         return 'Chờ duyệt';
-      case 'Active':
+      case 'Approved':
+        return 'Đã duyệt';
+      case 'Paid':
+        return 'Đã thanh toán';
+      case 'Activated':
         return 'Đang hoạt động';
-      case 'Expired':
-        return 'Đã hoàn thành';
       default:
         return status;
     }
@@ -286,21 +300,21 @@ class _ContractScreenState extends State<ContractScreen> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'Waiting':
+      case 'Pending':
         return Colors.orange;
-      case 'Active':
-        return Colors.green;
-      case 'Expired':
+      case 'Approved':
         return Colors.blue;
+      case 'Paid':
+        return Colors.purple;
+      case 'Activated':
+        return Colors.green;
       default:
         return Colors.grey;
     }
   }
 
   String _getButtonLabel(Contract contract) {
-    if (contract.currentStatus == 'Active' &&
-        (contract.paymentContract == null ||
-            contract.paymentContract?.status != 'Completed')) {
+    if (contract.status == 'Pending') {
       return 'Thanh toán';
     }
     return 'Chi tiết';

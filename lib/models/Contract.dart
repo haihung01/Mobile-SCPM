@@ -1,4 +1,3 @@
-// contract_model.dart
 import 'package:fe_capstone/models/car_model.dart';
 
 class Contract {
@@ -14,8 +13,7 @@ class Contract {
   final double long;
   final String note;
   final Car car;
-  final PaymentContract? paymentContract;
-  final String currentStatus;
+  final int paymentContractId; // Changed from PaymentContract? to int
 
   Contract({
     required this.contractId,
@@ -30,8 +28,7 @@ class Contract {
     required this.long,
     required this.note,
     required this.car,
-    this.paymentContract,
-    required this.currentStatus,
+    required this.paymentContractId,
   });
 
   factory Contract.fromJson(Map<String, dynamic> json) {
@@ -44,14 +41,11 @@ class Contract {
       parkingSpaceName: json['parkingSpaceName'] ?? '',
       parkingLotName: json['parkingLotName'] ?? '',
       parkingLotAddress: json['parkingLotAddress'] ?? '',
-      lat: json['lat']?.toDouble() ?? 0.0,
-      long: json['long']?.toDouble() ?? 0.0,
+      lat: (json['lat'] as num?)?.toDouble() ?? 0.0,
+      long: (json['long'] as num?)?.toDouble() ?? 0.0,
       note: json['note'] ?? '',
       car: Car.fromJson(json['car'] ?? {}),
-      paymentContract: json['paymentContract'] != null
-          ? PaymentContract.fromJson(json['paymentContract'])
-          : null,
-      currentStatus: json['currentStatus'] ?? '',
+      paymentContractId: json['paymentContractId'] ?? 0,
     );
   }
 
@@ -60,10 +54,9 @@ class Contract {
       if (dateValue == null) return DateTime.now();
 
       final dateString = dateValue.toString();
-
       if (dateString.isEmpty) return DateTime.now();
 
-      // Handle format: "2025/02/01 00:00"
+      // Handle format: "2025/04/05 00:00"
       if (dateString.contains('/')) {
         final datePart = dateString.split(' ')[0];
         final parts = datePart.split('/');
@@ -98,52 +91,7 @@ class Contract {
       'long': long,
       'note': note,
       'car': car.toJson(),
-      'paymentContract': paymentContract?.toJson(),
-      'currentStatus': currentStatus,
-    };
-  }
-}
-
-class PaymentContract {
-  final int paymentContractId;
-  final DateTime startDate;
-  final DateTime endDate;
-  final double paymentAmount;
-  final String? paymentMethod;
-  final String status;
-  final String note;
-
-  PaymentContract({
-    required this.paymentContractId,
-    required this.startDate,
-    required this.endDate,
-    required this.paymentAmount,
-    this.paymentMethod,
-    required this.status,
-    required this.note,
-  });
-
-  factory PaymentContract.fromJson(Map<String, dynamic> json) {
-    return PaymentContract(
-      paymentContractId: json['paymentContractId'] ?? 0,
-      startDate: Contract._parseContractDate(json['startDate']),
-      endDate: Contract._parseContractDate(json['endDate']),
-      paymentAmount: json['paymentAmount']?.toDouble() ?? 0.0,
-      paymentMethod: json['paymentMethod'],
-      status: json['status'] ?? '',
-      note: json['note'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
       'paymentContractId': paymentContractId,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
-      'paymentAmount': paymentAmount,
-      'paymentMethod': paymentMethod,
-      'status': status,
-      'note': note,
     };
   }
 }

@@ -1,4 +1,5 @@
 import 'package:fe_capstone/models/Contract.dart';
+import 'package:fe_capstone/ui/CustomerUI/payment/QRScreen.dart';
 import 'package:flutter/material.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -94,7 +95,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(width: 10),
                   const Text("Thanh toán qua VNPAY",
                       style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   const Spacer(),
                   const Icon(Icons.chevron_right),
                 ],
@@ -107,7 +108,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
               width: 250,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => QRScreen()),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(
@@ -116,7 +122,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 child: const Text("Thanh Toán",
                     style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -126,13 +132,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return "${date.day.toString().padLeft(2,'0')}/${date.month.toString().padLeft(2,'0')}/${date.year}";
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
   }
 
   String get totalCost {
-    if (widget.contract.paymentContract != null) {
-      return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
-    }
+    // if (widget.contract.paymentContract != null) {
+    //   return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
+    // }
     return 'Chưa có thông tin thanh toán';
   }
 
