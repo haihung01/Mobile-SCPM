@@ -1,5 +1,7 @@
-import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:flutter/material.dart';
+import 'package:fe_capstone/service/data_service.dart';
+import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen1 extends StatefulWidget {
   @override
@@ -7,23 +9,29 @@ class LoginScreen1 extends StatefulWidget {
 }
 
 class _LoginScreen1State extends State<LoginScreen1> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final DataService _dataService = DataService();
 
-  final String fakeEmail = "test@gmail.com";
-  final String fakePassword = "123";
+  Future<void> _login() async {
+    try {
+      final customer = await _dataService.login(
+        _usernameController.text,
+        _passwordController.text,
+      );
 
-  void _login() {
-    if (_emailController.text == fakeEmail &&
-        _passwordController.text == fakePassword) {
+      // Lưu trạng thái đăng nhập
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen1()),
       );
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Sai email hoặc mật khẩu!"),
+          content: Text(e.toString()),
           backgroundColor: Colors.red,
         ),
       );
@@ -64,9 +72,9 @@ class _LoginScreen1State extends State<LoginScreen1> {
               ),
               SizedBox(height: 20),
               TextField(
-                controller: _emailController,
+                controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: "Email",
+                  labelText: "Tên đăng nhập",
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),

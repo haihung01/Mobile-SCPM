@@ -1,8 +1,43 @@
+import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:fe_capstone/ui/screens/LoginScreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String username = '';
+  String email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? 'tiendat';
+      email = prefs.getString('email') ?? '';
+    });
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    // Chuyển hướng về màn hình login
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen1()),
+          (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,16 +81,16 @@ class ProfileScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          "letiendat",
+                          username,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          "mail1234@gmail.com",
+                          email,
                           style: TextStyle(
                             color: Colors.black54,
                           ),
@@ -88,13 +123,7 @@ class ProfileScreen extends StatelessWidget {
               width: 140,
               height: 35,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen1()),
-                    (route) => false,
-                  );
-                },
+                onPressed: logout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   shape: RoundedRectangleBorder(
@@ -117,7 +146,6 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
 
-      // Floating Button
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.green,
@@ -140,7 +168,7 @@ class ProfileScreen extends StatelessWidget {
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       trailing:
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+      const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
       onTap: () {},
     );
   }

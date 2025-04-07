@@ -13,7 +13,6 @@ class VehicleListScreen extends StatefulWidget {
 class _VehicleListScreenState extends State<VehicleListScreen> {
   final DataService _dataService = DataService();
   late Future<List<Car>> _futureVehicles;
-  final int customerId = 1; // Replace with actual customer ID
 
   @override
   void initState() {
@@ -23,7 +22,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
 
   void _loadVehicles() {
     setState(() {
-      _futureVehicles = _dataService.getCarsOfCustomer(customerId);
+      _futureVehicles = _dataService.getCarsOfCustomer();
     });
   }
 

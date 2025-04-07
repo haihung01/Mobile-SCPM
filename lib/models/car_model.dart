@@ -48,4 +48,30 @@ class Car {
       'customer': customer,
     };
   }
+
+  // Thêm vào Car model
+  Car copyWith({
+    int? carId,
+    int? customerId,
+    String? model,
+    String? color,
+    String? licensePlate,
+    String? registedDate,
+    bool? status,
+    List<dynamic>? contracts,
+    dynamic customer,
+  }) {
+    return Car(
+      carId: carId ?? this.carId,
+      customerId: customerId ?? this.customerId,
+      model: model ?? this.model,
+      color: color ?? this.color,
+      licensePlate: licensePlate ?? this.licensePlate,
+      registedDate: registedDate ?? this.registedDate,
+      status: status ?? this.status,
+      contracts: contracts ?? this.contracts,
+      customer: customer ?? this.customer,
+    );
+  }
 }
+

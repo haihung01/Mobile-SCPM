@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       title: 'Capstone Project',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color(0xFF6EC2F7)),
-      home: WelcomeScreen(),
+      home: HomeScreen1(),
       // home: ListParkingScreen(),
       // home: RegisterScreen1(),
       // home: ContractScreen(),
@@ -47,3 +47,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+

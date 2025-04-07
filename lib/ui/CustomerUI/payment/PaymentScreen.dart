@@ -1,8 +1,15 @@
+import 'package:fe_capstone/models/Contract.dart';
 import 'package:flutter/material.dart';
 
-class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key});
+class PaymentScreen extends StatefulWidget {
+  final Contract contract;
+  const PaymentScreen({super.key, required this.contract});
 
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,13 +37,13 @@ class PaymentScreen extends StatelessWidget {
               title: "Thời gian Để xe",
               content: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("15/09/2023",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text("15/10/2023",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                children: [
+                  Text(_formatDate(widget.contract.startDate),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(_formatDate(widget.contract.endDate),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
                 ],
               ),
             ),
@@ -51,21 +58,25 @@ class PaymentScreen extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text("oto 1", style: TextStyle(fontSize: 16)),
-                      Text("thông tin bãi đỗ", style: TextStyle(fontSize: 16)),
+                    children: [
+                      Text(widget.contract.car.model,
+                          style: const TextStyle(fontSize: 16)),
+                      Text(widget.contract.parkingSpaceName,
+                          style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                   const Divider(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text("Tổng cộng",
+                    children: [
+                      const Text("Tổng cộng",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text("100,000đ",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        totalCost,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                     ],
                   ),
                 ],
@@ -83,7 +94,7 @@ class PaymentScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   const Text("Thanh toán qua VNPAY",
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   const Spacer(),
                   const Icon(Icons.chevron_right),
                 ],
@@ -105,13 +116,24 @@ class PaymentScreen extends StatelessWidget {
                 ),
                 child: const Text("Thanh Toán",
                     style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2,'0')}/${date.month.toString().padLeft(2,'0')}/${date.year}";
+  }
+
+  String get totalCost {
+    if (widget.contract.paymentContract != null) {
+      return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
+    }
+    return 'Chưa có thông tin thanh toán';
   }
 
   Widget _buildInfoCard({
