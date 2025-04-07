@@ -130,9 +130,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   String get totalCost {
-    if (widget.contract.paymentContract != null) {
-      return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
-    }
+    // if (widget.contract.paymentContract != null) {
+    //   return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
+    // }
     return 'Chưa có thông tin thanh toán';
   }
 

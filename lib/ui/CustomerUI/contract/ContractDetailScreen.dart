@@ -23,9 +23,9 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   }
 
   String get totalCost {
-    if (widget.contract.paymentContract != null) {
-      return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
-    }
+    // if (widget.contract.paymentContract != null) {
+    //   return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
+    // }
     return 'Chưa có thông tin thanh toán';
   }
 
@@ -73,7 +73,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   ),
                   SizedBox(height: 12),
                   _buildInfoRow("Mã hợp đồng:", widget.contract.contractId.toString()),
-                  _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.currentStatus)),
+                  _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.note)),
                 ],
               ),
             ),
@@ -104,11 +104,11 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   _buildInfoRow("Từ ngày:", _formatDate(widget.contract.startDate)),
                   _buildInfoRow("Đến ngày:", _formatDate(widget.contract.endDate)),
                   SizedBox(height: 8),
-                  if (widget.contract.paymentContract != null) ...[
-                    Divider(height: 24, thickness: 1),
-                    _buildInfoRow("Trạng thái thanh toán:",
-                        _getPaymentStatusText(widget.contract.paymentContract!.status)),
-                  ],
+                  // if (widget.contract.paymentContract != null) ...[
+                  //   Divider(height: 24, thickness: 1),
+                  //   _buildInfoRow("Trạng thái thanh toán:",
+                  //       _getPaymentStatusText(widget.contract.paymentContract!.status)),
+                  // ],
                 ],
               ),
             ),
