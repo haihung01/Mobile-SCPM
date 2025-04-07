@@ -111,7 +111,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => QRScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => QRScreen(
+                              paymentContractId:
+                                  widget.contract.paymentContractId,
+                            )),
                   );
                 },
                 style: ElevatedButton.styleFrom(

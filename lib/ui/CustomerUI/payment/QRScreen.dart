@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
+import 'package:fe_capstone/service/data_service.dart';
 
 class QRScreen extends StatelessWidget {
+  final int paymentContractId;
+  const QRScreen({super.key, required this.paymentContractId});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,11 +35,9 @@ class QRScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // Nội dung chính
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 40),
               child: Column(
                 children: [
                   Expanded(
@@ -57,15 +59,12 @@ class QRScreen extends StatelessWidget {
                               color: Colors.black,
                             ),
                           ),
-                          SizedBox(height: 50),
+                          // SizedBox(height: 10),
                           Container(
                             width: 500,
                             height: 500,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black12),
-                            ),
                             child: Image.asset(
-                              'assets/images/QR.jpg',
+                              'assets/images/QR1.png',
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -74,11 +73,36 @@ class QRScreen extends StatelessWidget {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen1()),
-                      );
+                    onPressed: () async {
+                      final dataService = DataService();
+
+                      try {
+                        await dataService.payContract(paymentContractId);
+
+                        // Hiện thông báo thành công
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Thanh toán thành công!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+
+                        // Chuyển về HomeScreen sau khi thành công
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomeScreen1()),
+                        );
+                      } catch (e) {
+                        // Thông báo lỗi
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Thanh toán thất bại: ${e.toString()}'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

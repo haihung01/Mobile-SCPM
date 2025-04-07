@@ -32,10 +32,7 @@ class DataService {
             'Accept': 'application/json',
           },
         ),
-        data: {
-          "keyword": "",
-          "customerId": customerId
-        },
+        data: {"keyword": "", "customerId": customerId},
       );
 
       if (response.statusCode == 200) {
@@ -52,7 +49,8 @@ class DataService {
   Future<List<Car>> getCarsOfCustomer() async {
     try {
       final customerId = await _getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Car/GetCarsOfCustomer?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Car/GetCarsOfCustomer?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Car/GetCarsOfCustomer',
@@ -165,7 +163,8 @@ class DataService {
   Future<List<Contract>> getCustomerContracts() async {
     try {
       final customerId = await _getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer',
@@ -195,7 +194,8 @@ class DataService {
         "endDate": endDate.toIso8601String(),
       };
 
-      print('[API] Calling: ${BaseConstants.BASE_URL}/ParkingLot/SearchAvailablesForContract');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/ParkingLot/SearchAvailablesForContract');
       print('[API] Request data: $requestData');
 
       final response = await _dio.post(
@@ -215,7 +215,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => ParkingLot.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load available parking lots: ${response.statusCode} - ${response.data}');
+        throw Exception(
+            'Failed to load available parking lots: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
       print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
@@ -231,7 +232,8 @@ class DataService {
   Future<List<Contract>> getPendingContracts() async {
     try {
       final customerId = await _getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPendingContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPendingContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetPendingContracts',
@@ -243,7 +245,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load pending contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load pending contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -253,7 +256,8 @@ class DataService {
   Future<List<Contract>> getApprovedContracts() async {
     try {
       final customerId = await _getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetApprovedContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetApprovedContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetApprovedContracts',
@@ -265,7 +269,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load approved contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load approved contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -275,7 +280,8 @@ class DataService {
   Future<List<Contract>> getPaidContracts() async {
     try {
       final customerId = await _getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPaidContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPaidContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetPaidContracts',
@@ -287,7 +293,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load paid contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load paid contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -297,7 +304,8 @@ class DataService {
   Future<List<Contract>> getActivatedContracts() async {
     try {
       final customerId = await _getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetActivatedContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetActivatedContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetActivatedContracts',
@@ -309,10 +317,61 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load activated contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load activated contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
+    }
+  }
+
+  Future<List<Contract>> getRejectedContracts() async {
+    try {
+      final customerId = await _getCustomerId();
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetRejectedContracts?customerId=$customerId');
+
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Contract/GetActivatedContracts',
+        queryParameters: {'customerId': customerId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((e) => Contract.fromJson(e)).toList();
+      } else {
+        throw Exception(
+            'Failed to load activated contracts: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error occurred: ${e.toString()}');
+    }
+  }
+
+  Future<void> payContract(int paymentContractId) async {
+    try {
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/Pay/$paymentContractId');
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Contract/Pay/$paymentContractId',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Payment successful');
+      } else {
+        throw Exception('Payment failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error during payment: $e');
+      throw Exception('Payment error: $e');
     }
   }
 
@@ -349,13 +408,15 @@ class DataService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Contract.fromJson(response.data);
       } else {
-        throw Exception('Failed to add contract: ${response.statusCode} - ${response.data}');
+        throw Exception(
+            'Failed to add contract: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
       print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
       if (e.response?.statusCode == 500) {
         // Handle the specific circular reference error
-        final errorMessage = e.response?.data['message'] ?? 'Unknown server error';
+        final errorMessage =
+            e.response?.data['message'] ?? 'Unknown server error';
         if (errorMessage.contains('object cycle was detected')) {
           // Return null and let the UI handle the success case differently
           print('Circular reference detected in server response');
@@ -368,6 +429,4 @@ class DataService {
       throw Exception('Error occurred: $e');
     }
   }
-
-
 }
