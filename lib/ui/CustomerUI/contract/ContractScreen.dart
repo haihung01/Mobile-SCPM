@@ -29,17 +29,15 @@ class _ContractScreenState extends State<ContractScreen> {
 
   Future<List<Contract>> _fetchContractsForTab(int tabIndex) async {
     try {
-      switch (tabIndex) {
-        case 0: // Pending
-          return await _dataService.getPendingContracts();
-        case 1: // Approved
-          return await _dataService.getApprovedContracts();
-        case 2: // Paid
-          return await _dataService.getPaidContracts();
-        case 3: // Activated
-          return await _dataService.getActivatedContracts();
-        default:
-          return [];
+      if (tabIndex == 0) {
+        // Combine Pending, Approved, and Rejected contracts for "Chưa Thanh Toán"
+        final pendingContracts = await _dataService.getPendingContracts();
+        final approvedContracts = await _dataService.getApprovedContracts();
+        final rejectedContracts = await _dataService.getRejectedContracts();
+        return [...pendingContracts, ...approvedContracts, ...rejectedContracts];
+      } else {
+        // "Đã Thanh Toán" tab
+        return await _dataService.getPaidContracts();
       }
     } catch (e) {
       throw Exception('Failed to load contracts: ${e.toString()}');
@@ -82,10 +80,8 @@ class _ContractScreenState extends State<ContractScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTabButton("Chờ duyệt", 0),
-                _buildTabButton("Đã duyệt", 1),
-                _buildTabButton("Đang hoạt động", 3),
-                _buildTabButton("Đã thanh toán", 2),
+                _buildTabButton("Chưa Thanh Toán", 0),
+                _buildTabButton("Đã Thanh Toán", 1),
               ],
             ),
             const SizedBox(height: 16),
@@ -138,7 +134,7 @@ class _ContractScreenState extends State<ContractScreen> {
           });
         },
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 2),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: selectedTabIndex == index ? Colors.green : Colors.grey[200],
@@ -149,7 +145,7 @@ class _ContractScreenState extends State<ContractScreen> {
             text,
             style: TextStyle(
               color: selectedTabIndex == index ? Colors.white : Colors.black,
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -169,111 +165,100 @@ class _ContractScreenState extends State<ContractScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: const Icon(Icons.directions_car, size: 40, color: Colors.grey),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Hợp Đồng Xe ${contract.car.model}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: const Icon(Icons.directions_car, size: 40, color: Colors.grey),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 4),
+                  Row(
                     children: [
-                      Text(
-                        contract.car.model,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        contract.parkingSpaceName,
-                        style: const TextStyle(color: Colors.black54, fontSize: 14),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.place, size: 14, color: Colors.green),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              contract.parkingLotAddress,
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                      const Icon(Icons.place, size: 14, color: Colors.green),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          "Bãi ${contract.parkingSpaceName}",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.1),
-                              border: Border.all(color: statusColor),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              statusText,
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: statusColor),
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '${contract.startDate.day}/${contract.startDate.month}/${contract.startDate.year} - ${contract.endDate.day}/${contract.endDate.month}/${contract.endDate.year}',
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.black54),
-                          ),
-                        ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (buttonLabel.toLowerCase() == "thanh toán") {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PaymentScreen(contract: contract)),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ContractDetailScreen(contract: contract)),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.1),
+                          border: Border.all(color: statusColor),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          statusText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: statusColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (buttonLabel.toLowerCase() == "thanh toán") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentScreen(contract: contract),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ContractDetailScreen(contract: contract),
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text(
-                  buttonLabel,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+              child: Text(
+                buttonLabel,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -289,10 +274,10 @@ class _ContractScreenState extends State<ContractScreen> {
         return 'Chờ duyệt';
       case 'Approved':
         return 'Đã duyệt';
+      case 'Rejected':
+        return 'Từ chối';
       case 'Paid':
         return 'Đã thanh toán';
-      case 'Activated':
-        return 'Đang hoạt động';
       default:
         return status;
     }
@@ -301,20 +286,20 @@ class _ContractScreenState extends State<ContractScreen> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Pending':
-        return Colors.orange;
+        return Colors.orange; // Vàng
       case 'Approved':
-        return Colors.blue;
+        return Colors.green; // Xanh
+      case 'Rejected':
+        return Colors.red; // Đỏ
       case 'Paid':
         return Colors.purple;
-      case 'Activated':
-        return Colors.green;
       default:
         return Colors.grey;
     }
   }
 
   String _getButtonLabel(Contract contract) {
-    if (contract.status == 'Pending') {
+    if (contract.status == 'Approved') {
       return 'Thanh toán';
     }
     return 'Chi tiết';

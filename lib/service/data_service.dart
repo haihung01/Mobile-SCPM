@@ -316,6 +316,28 @@ class DataService {
     }
   }
 
+  Future<List<Contract>> getRejectedContracts() async {
+    try {
+      final customerId = await _getCustomerId();
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetRejectedContracts?customerId=$customerId');
+
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Contract/GetActivatedContracts',
+        queryParameters: {'customerId': customerId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((e) => Contract.fromJson(e)).toList();
+      } else {
+        throw Exception('Failed to load activated contracts: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error occurred: ${e.toString()}');
+    }
+  }
+
   Future<Contract?> addContract({
     required int carId,
     required int parkingLotId,
