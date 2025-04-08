@@ -1,5 +1,8 @@
+import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:fe_capstone/models/parking_lot_model.dart';
+import 'package:fe_capstone/models/car_model.dart';
 
 class ListParkingScreen extends StatefulWidget {
   @override
@@ -7,14 +10,109 @@ class ListParkingScreen extends StatefulWidget {
 }
 
 class _ListParkingScreenState extends State<ListParkingScreen> {
-  String? selectedCar = 'oto 1';
+  Car? selectedCar;
+  ParkingLot? selectedParking;
+  int selectedMonthDuration = 1;
+  String totalCost = '0đ';
+  List<ParkingLot> parkingLots = [];
+  List<Car> cars = [];
+  bool isLoading = true;
+  bool isLoadingCars = true;
+  String? errorMessage;
+  final DataService _dataService = DataService();
 
-  String? selectedParking;
-  DateTime selectedDate = DateTime(2023, 9, 15);
-  final String totalCost = '100,000đ';
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    setState(() {
+      isLoading = true;
+      isLoadingCars = true;
+      errorMessage = null;
+    });
+
+    try {
+      await Future.wait([
+        _fetchCars(),
+        _fetchAvailableParkingLots(),
+      ]);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Không thể tải dữ liệu: ${e.toString()}';
+      });
+    }
+  }
+
+  Future<void> _fetchCars() async {
+    try {
+      final carList = await _dataService.getCarsOfCustomer();
+      setState(() {
+        cars = carList;
+        if (carList.isNotEmpty) {
+          selectedCar = carList.first;
+        }
+        isLoadingCars = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingCars = false;
+        errorMessage = 'Không thể tải danh sách xe: ${e.toString()}';
+      });
+    }
+  }
+
+  Future<void> _fetchAvailableParkingLots() async {
+    try {
+      final startDate = DateTime.now();
+      final endDate = DateTime(
+        startDate.year,
+        startDate.month + selectedMonthDuration,
+        startDate.day,
+      );
+
+      final lots = await _dataService.searchAvailableParkingForContract(
+        startDate: startDate,
+        endDate: endDate,
+      );
+
+      setState(() {
+        parkingLots = lots;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Không thể tải danh sách bãi xe: ${e.toString()}';
+      });
+    }
+  }
+
+  void _calculateTotalCost() {
+    if (selectedParking != null && selectedParking!.pricePerMonth != null) {
+      final cost = selectedParking!.pricePerMonth! * selectedMonthDuration;
+      setState(() {
+        totalCost = '${cost.toStringAsFixed(0)}đ';
+      });
+    } else {
+      setState(() {
+        totalCost = '0đ';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final startDate = DateTime.now();
+    final endDate = DateTime(
+      startDate.year,
+      startDate.month + selectedMonthDuration,
+      startDate.day,
+    );
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -34,33 +132,55 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Thời gian để xe
             Container(
               padding: EdgeInsets.all(16),
               decoration: _boxDecoration(),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.access_time, color: Colors.grey[700]),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    children: [
+                      Icon(Icons.access_time, color: Colors.grey[700], size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        "Thời gian để xe",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[800],
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 28),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Thời gian Để xe",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[800])),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_formatDate(selectedDate),
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w700)),
-                            Text(_formatDate(selectedDate),
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w800)),
-                          ],
+                        Text(
+                          '${_formatDate(startDate)} - ${_formatDate(endDate)}',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w700),
+                        ),
+                        DropdownButton<int>(
+                          value: selectedMonthDuration,
+                          items: List.generate(12, (index) {
+                            int months = index + 1;
+                            return DropdownMenuItem(
+                              value: months,
+                              child: Text("$months tháng"),
+                            );
+                          }),
+                          onChanged: (value) async {
+                            if (value != null) {
+                              setState(() {
+                                selectedMonthDuration = value;
+                              });
+                              await _fetchAvailableParkingLots();
+                              _calculateTotalCost();
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -69,8 +189,6 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
               ),
             ),
             SizedBox(height: 16),
-
-            // Chọn xe
             Container(
               padding: EdgeInsets.all(16),
               decoration: _boxDecoration(),
@@ -88,7 +206,33 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                     ],
                   ),
                   SizedBox(height: 12),
-                  Text("oto 1", style: TextStyle(fontSize: 16)),
+                  if (isLoadingCars)
+                    CircularProgressIndicator()
+                  else if (cars.isEmpty)
+                    Text("Không có xe nào", style: TextStyle(fontSize: 16))
+                  else
+                    DropdownButton<Car>(
+                      value: selectedCar,
+                      isExpanded: true,
+                      items: cars.map((car) {
+                        return DropdownMenuItem<Car>(
+                          value: car,
+                          child: Text(
+                            car.licensePlate.isNotEmpty
+                                ? car.licensePlate
+                                : 'Xe không biển số',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (Car? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            selectedCar = newValue;
+                          });
+                        }
+                      },
+                    ),
                   Divider(height: 24, thickness: 1),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,25 +251,49 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
               ),
             ),
             SizedBox(height: 16),
-
-            // Danh sách bãi xe
-            _buildParkingCard("Bãi Xe A", "status: trống 10 chỗ"),
-            _buildParkingCard("Bãi Xe B", "Mô tả"),
-            _buildParkingCard("Bãi Xe C", "Mô tả"),
-
+            if (isLoading)
+              Center(
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: CircularProgressIndicator()))
+            else if (errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  errorMessage!,
+                  style: TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              )
+            else if (parkingLots.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Không có bãi xe nào khả dụng trong khoảng thời gian này',
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              else
+                ...parkingLots.map((parking) => _buildParkingCard(parking)),
             SizedBox(height: 24),
-
-            // Gửi button
             SizedBox(
               width: 190,
               height: 40,
               child: ElevatedButton(
-                onPressed: _onSubmit,
+                onPressed: (selectedParking != null && selectedCar != null)
+                    ? () => _onSubmit(startDate, endDate)
+                    : null,
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18))),
-                child: Text("Gửi", style: TextStyle(fontSize: 18)),
+                  backgroundColor: (selectedParking != null && selectedCar != null)
+                      ? Colors.green
+                      : Colors.grey,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18)),
+                ),
+                child: Text(
+                  "Gửi",
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
             ),
           ],
@@ -134,13 +302,17 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
     );
   }
 
-  Widget _buildParkingCard(String title, String subtitle) {
+  Widget _buildParkingCard(ParkingLot parking) {
+    final isSelected = selectedParking?.parkingLotId == parking.parkingLotId;
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isSelected
+            ? Border.all(color: Colors.green, width: 2)
+            : null,
         boxShadow: [
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
@@ -161,15 +333,33 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  parking.address ?? 'Không có tên',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.location_on, color: Colors.green, size: 16),
                     SizedBox(width: 4),
-                    Text(subtitle, style: TextStyle(fontSize: 14)),
+                    Expanded(
+                      child: Text(
+                        parking.address ?? 'Không có địa chỉ',
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.attach_money, color: Colors.green, size: 16),
+                    SizedBox(width: 4),
+                    Text(
+                      '${parking.pricePerMonth?.toStringAsFixed(0) ?? 'N/A'}đ/tháng',
+                      style: TextStyle(fontSize: 14),
+                    ),
                   ],
                 )
               ],
@@ -178,33 +368,70 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                selectedParking = title;
+                selectedParking = parking;
+                _calculateTotalCost();
               });
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: isSelected ? Colors.green[800] : Colors.green,
               minimumSize: Size(60, 36),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text("chọn"),
+            child: Text(isSelected ? "Đã chọn" : "Chọn"),
           )
         ],
       ),
     );
   }
 
-  void _onSubmit() {
-    if (selectedCar != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Hợp đồng đã được gửi!")),
-      );
+  Future<void> _onSubmit(DateTime startDate, DateTime endDate) async {
+    if (selectedParking != null && selectedCar != null) {
+      try {
+        // Show loading indicator
+        setState(() {
+          isLoading = true;
+        });
 
-      // Điều hướng sang trang ContractScreen
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ContractScreen()),
-      );
+        // Call API to add contract
+        final contract = await _dataService.addContract(
+          carId: selectedCar!.carId,
+          parkingLotId: selectedParking!.parkingLotId,
+          startDate: startDate,
+          endDate: endDate,
+          note: "Đăng ký hợp đồng",
+        );
+
+        // Hide loading indicator
+        setState(() {
+          isLoading = false;
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Hợp đồng đã được gửi thành công!")),
+        );
+
+        // Navigate to ContractScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ContractScreen(
+              // You can pass the contract object if ContractScreen accepts it
+            ),
+          ),
+        );
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Gửi hợp đồng thất bại"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Vui lòng chọn xe và bãi xe")),

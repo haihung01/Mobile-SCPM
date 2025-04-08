@@ -252,7 +252,9 @@ class _ContractScreenState extends State<LocationScreen> {
               SizedBox(
                 height: 38,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context); // đóng BottomSheet trước
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade600,
                     foregroundColor: Colors.white,
@@ -501,13 +503,13 @@ class _ContractScreenState extends State<LocationScreen> {
                           ),
                           InkWell(
                             onTap: () {
-                              FocusScope.of(context).unfocus(); // Ẩn bàn phím
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ListParkingScreen(),
-                                ),
-                              );
+                              // FocusScope.of(context).unfocus(); // Ẩn bàn phím
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => ListParkingScreen(),
+                              //   ),
+                              // );
                             },
                             child: Container(
                               width: 16 * fem,

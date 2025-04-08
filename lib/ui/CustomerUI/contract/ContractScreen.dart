@@ -1,3 +1,6 @@
+import 'package:fe_capstone/models/Contract.dart';
+import 'package:fe_capstone/service/data_service.dart';
+import 'package:fe_capstone/ui/CustomerUI/contract/ContractDetailScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/payment/PaymentScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
@@ -9,33 +12,40 @@ class ContractScreen extends StatefulWidget {
 
 class _ContractScreenState extends State<ContractScreen> {
   int selectedTabIndex = 0;
+  late Future<List<Contract>> futureContracts;
+  final DataService _dataService = DataService();
 
-  final List<Map<String, String>> contractList = [
-    {
-      "title": "Hợp Đồng Xe A",
-      "description": "Kiểm tra sức khỏe",
-      "location": "Bs. Trịnh Ngọc Bảo",
-      "image": "assets/images/car1.jpg",
-      "status": "Đã duyệt",
-      "button": "Thanh toán"
-    },
-    {
-      "title": "Hợp Đồng Xe B",
-      "description": "Tiền cọc",
-      "location": "Bs. Đỗ Tài Nhân",
-      "image": "assets/images/car2.webp",
-      "status": "Đang chờ duyệt",
-      "button": "Chi tiết"
-    },
-    {
-      "title": "Hợp Đồng Xe C",
-      "description": "Nhận chăm sóc",
-      "location": "Bs. Cố Đỗ Số 7",
-      "image": "assets/images/car1.jpg",
-      "status": "Đã duyệt",
-      "button": "Thanh toán"
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadContracts();
+  }
+
+  void _loadContracts() {
+    setState(() {
+      futureContracts = _fetchContractsForTab(selectedTabIndex);
+    });
+  }
+
+  Future<List<Contract>> _fetchContractsForTab(int tabIndex) async {
+    try {
+      if (tabIndex == 0) {
+        // Combine Pending, Approved, and Rejected contracts for "Chưa Thanh Toán"
+        final pendingContracts = await _dataService.getPendingContracts();
+        final approvedContracts = await _dataService.getApprovedContracts();
+        final rejectedContracts = await _dataService.getRejectedContracts();
+        return [...pendingContracts, ...approvedContracts, ...rejectedContracts];
+      } else if (tabIndex == 1) {
+        // "Đã Thanh Toán" tab
+        return await _dataService.getPaidContracts();
+      } else {
+        // "Đang Hoạt Động" tab
+        return await _dataService.getActivatedContracts();
+      }
+    } catch (e) {
+      throw Exception('Failed to load contracts: ${e.toString()}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,23 +84,31 @@ class _ContractScreenState extends State<ContractScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTabButton("Chưa Thanh Toán", 0),
-                _buildTabButton("Đã thanh toán", 1),
+                _buildTabButton("Đã Thanh Toán", 1),
+                _buildTabButton("Đang Hoạt Động", 2),
               ],
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: contractList.length,
-                itemBuilder: (context, index) {
-                  final item = contractList[index];
-                  return _buildContractCard(
-                    item["title"]!,
-                    item["description"]!,
-                    item["location"]!,
-                    item["image"]!,
-                    item["status"]!,
-                    item["button"]!,
-                  );
+              child: FutureBuilder<List<Contract>>(
+                future: futureContracts,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Không có hợp đồng nào'));
+                  } else {
+                    final contracts = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: contracts.length,
+                      itemBuilder: (context, index) {
+                        final contract = contracts[index];
+                        return _buildContractCard(contract);
+                      },
+                    );
+                  }
                 },
               ),
             ),
@@ -116,9 +134,11 @@ class _ContractScreenState extends State<ContractScreen> {
         onTap: () {
           setState(() {
             selectedTabIndex = index;
+            _loadContracts();
           });
         },
         child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: selectedTabIndex == index ? Colors.green : Colors.grey[200],
@@ -129,7 +149,7 @@ class _ContractScreenState extends State<ContractScreen> {
             text,
             style: TextStyle(
               color: selectedTabIndex == index ? Colors.white : Colors.black,
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -138,27 +158,10 @@ class _ContractScreenState extends State<ContractScreen> {
     );
   }
 
-  // Card Widget
-  Widget _buildContractCard(
-    String title,
-    String description,
-    String location,
-    String image,
-    String status,
-    String buttonLabel,
-  ) {
-    Color statusColor;
-    switch (status) {
-      case 'Đã duyệt':
-        statusColor = Colors.green;
-        break;
-      case 'Đang chờ duyệt':
-        statusColor = Colors.orange;
-        break;
-
-      default:
-        statusColor = Colors.blueGrey;
-    }
+  Widget _buildContractCard(Contract contract) {
+    final statusText = _getStatusText(contract.status);
+    final statusColor = _getStatusColor(contract.status);
+    final buttonLabel = _getButtonLabel(contract);
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -169,9 +172,8 @@ class _ContractScreenState extends State<ContractScreen> {
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child:
-                  Image.asset(image, width: 80, height: 80, fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(8),
+              child: const Icon(Icons.directions_car, size: 40, color: Colors.grey),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -179,54 +181,73 @@ class _ContractScreenState extends State<ContractScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    "Hợp Đồng Xe ${contract.car.model}",
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: const TextStyle(color: Colors.black54, fontSize: 14),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(Icons.place, size: 14, color: Colors.green),
                       const SizedBox(width: 4),
-                      Text(
-                        location,
-                        style: const TextStyle(
-                            fontSize: 14, color: Colors.black54),
+                      Expanded(
+                        child: Text(
+                          "Bãi ${contract.parkingSpaceName}",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      border: Border.all(color: statusColor),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      status,
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: statusColor),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.1),
+                          border: Border.all(color: statusColor),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          statusText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: statusColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
             ElevatedButton(
               onPressed: () {
-                if (buttonLabel.toLowerCase() == "chi tiết") {
+                if (buttonLabel.toLowerCase() == "thanh toán") {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const PaymentScreen()),
+                      builder: (context) => PaymentScreen(contract: contract),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ContractDetailScreen(contract: contract),
+                    ),
                   );
                 }
               },
@@ -235,15 +256,60 @@ class _ContractScreenState extends State<ContractScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               child: Text(
                 buttonLabel,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'Pending':
+        return 'Chờ duyệt';
+      case 'Approved':
+        return 'Đã duyệt';
+      case 'Rejected':
+        return 'Từ chối';
+      case 'Paid':
+        return 'Đã thanh toán';
+      case 'Activated':
+        return 'Đang hoạt động';
+      default:
+        return status;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Pending':
+        return Colors.orange; // Vàng
+      case 'Approved':
+        return Colors.green; // Xanh
+      case 'Rejected':
+        return Colors.red; // Đỏ
+      case 'Paid':
+        return Colors.purple;
+      case 'Activated':
+        return Colors.blue; // You can change this color if needed
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getButtonLabel(Contract contract) {
+    if (contract.status == 'Approved') {
+      return 'Thanh toán';
+    }
+    return 'Chi tiết';
   }
 }

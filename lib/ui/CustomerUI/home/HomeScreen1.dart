@@ -1,10 +1,11 @@
-import 'package:fe_capstone/ui/CustomerUI/LocationScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/profile/ProfileScreen1.dart';
-import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleManagementScreen.dart';
-import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
-// import 'package:fe_capstone/widgets/custom_footer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fe_capstone/ui/screens/LoginScreen1.dart';
+import 'package:fe_capstone/ui/CustomerUI/LocationScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/profile/ProfileScreen1.dart';
+import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 
 class HomeScreen1 extends StatefulWidget {
   @override
@@ -13,6 +14,47 @@ class HomeScreen1 extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen1> {
   int _selectedIndex = 0;
+
+  Future<bool> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
+
+  Future<void> _handleProtectedNavigation(BuildContext context, Widget screen) async {
+    final isLoggedIn = await _checkLoginStatus();
+
+    if (!isLoggedIn) {
+      await _showLoginRequiredDialog(context);
+    } else {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+    }
+  }
+
+  Future<void> _showLoginRequiredDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Yêu cầu đăng nhập'),
+        content: const Text('Vui lòng đăng nhập để sử dụng tính năng này'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen1()),
+              );
+            },
+            child: const Text('Đăng nhập'),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -29,11 +71,8 @@ class _HomeScreenState extends State<HomeScreen1> {
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
-              );
+            onTap: () async {
+              await _handleProtectedNavigation(context, ProfileScreen());
             },
             child: const CircleAvatar(
               backgroundImage: AssetImage("assets/images/profile1.webp"),
@@ -41,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen1> {
           ),
         ),
         title: const Text(
-          "SPCM",
+          "SCPM",
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,
@@ -66,12 +105,29 @@ class _HomeScreenState extends State<HomeScreen1> {
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
                 children: [
-                  _buildCard(Icons.location_on_outlined, "Tìm Bãi Đỗ", context),
-                  _buildCard(Icons.layers_outlined, "Hợp Đồng", context),
                   _buildCard(
-                      Icons.directions_car_outlined, "Danh sách xe", context),
-                  _buildCard(Icons.notifications_active_outlined, "Thông Báo",
-                      context),
+                    Icons.location_on_outlined,
+                    "Tìm Bãi Đỗ",
+                        () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LocationScreen()),
+                    ),
+                  ),
+                  _buildCard(
+                    Icons.layers_outlined,
+                    "Hợp Đồng",
+                        () => _handleProtectedNavigation(context, ContractScreen()),
+                  ),
+                  _buildCard(
+                    Icons.directions_car_outlined,
+                    "Danh sách xe",
+                        () => _handleProtectedNavigation(context, VehicleListScreen()),
+                  ),
+                  _buildCard(
+                    Icons.notifications_active_outlined,
+                    "Thông Báo",
+                        () {}, // Xử lý thông báo
+                  ),
                 ],
               ),
             ),
@@ -91,29 +147,12 @@ class _HomeScreenState extends State<HomeScreen1> {
     );
   }
 
-  Widget _buildCard(IconData icon, String title, BuildContext context) {
+  Widget _buildCard(IconData icon, String title, VoidCallback onTap) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
-        onTap: () {
-          if (title == "Tìm Bãi Đỗ") {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LocationScreen()),
-            );
-          } else if (title == "Hợp Đồng") {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ContractScreen()),
-            );
-          } else if (title == "Danh sách xe") {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => VehicleListScreen()),
-            );
-          }
-        },
+        onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -121,7 +160,10 @@ class _HomeScreenState extends State<HomeScreen1> {
             const SizedBox(height: 10),
             Text(
               title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

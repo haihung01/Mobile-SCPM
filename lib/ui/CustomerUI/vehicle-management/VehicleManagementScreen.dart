@@ -13,7 +13,6 @@ class VehicleListScreen extends StatefulWidget {
 class _VehicleListScreenState extends State<VehicleListScreen> {
   final DataService _dataService = DataService();
   late Future<List<Car>> _futureVehicles;
-  final int customerId = 1; // Replace with actual customer ID
 
   @override
   void initState() {
@@ -23,7 +22,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
 
   void _loadVehicles() {
     setState(() {
-      _futureVehicles = _dataService.getCarsOfCustomer(customerId);
+      _futureVehicles = _dataService.getCarsOfCustomer();
     });
   }
 
@@ -50,7 +49,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
+      bottomNavigationBar:
+          CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
     );
   }
 
@@ -118,27 +118,32 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
                   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
-                  height: 138,
+                  height: 128,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    height: 138,
+                    height: 128,
                     color: Colors.grey[200],
                     child: Icon(Icons.car_repair, size: 50),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-              Center(
-                child: Text(
-                  "${vehicle.model} ${vehicle.color}",
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Text(
+                vehicle.model,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
-                "🚗 Biển Số: ${vehicle.licensePlate}",
+                "Màu xe: ${vehicle.color}",
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                "Biển Số: ${vehicle.licensePlate}",
                 style: const TextStyle(color: Colors.black54),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -162,7 +167,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
             children: [
               Icon(Icons.add, size: 30, color: Colors.black54),
               SizedBox(height: 8),
-              Text("Thêm Xe", style: TextStyle(fontSize: 16, color: Colors.black54)),
+              Text("Thêm Xe",
+                  style: TextStyle(fontSize: 16, color: Colors.black54)),
             ],
           ),
         ),
