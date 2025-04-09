@@ -20,7 +20,8 @@ class _HomeScreenState extends State<HomeScreen1> {
     return prefs.getBool('isLoggedIn') ?? false;
   }
 
-  Future<void> _handleProtectedNavigation(BuildContext context, Widget screen) async {
+  Future<void> _handleProtectedNavigation(
+      BuildContext context, Widget screen) async {
     final isLoggedIn = await _checkLoginStatus();
 
     if (!isLoggedIn) {
@@ -108,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen1> {
                   _buildCard(
                     Icons.location_on_outlined,
                     "Tìm Bãi Đỗ",
-                        () => Navigator.push(
+                    () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => LocationScreen()),
                     ),
@@ -116,17 +117,18 @@ class _HomeScreenState extends State<HomeScreen1> {
                   _buildCard(
                     Icons.layers_outlined,
                     "Hợp Đồng",
-                        () => _handleProtectedNavigation(context, ContractScreen()),
+                    () => _handleProtectedNavigation(context, ContractScreen()),
                   ),
                   _buildCard(
                     Icons.directions_car_outlined,
                     "Danh sách xe",
-                        () => _handleProtectedNavigation(context, VehicleListScreen()),
+                    () => _handleProtectedNavigation(
+                        context, VehicleListScreen()),
                   ),
                   _buildCard(
                     Icons.notifications_active_outlined,
                     "Thông Báo",
-                        () {}, // Xử lý thông báo
+                    () {}, // Xử lý thông báo
                   ),
                 ],
               ),
@@ -137,7 +139,15 @@ class _HomeScreenState extends State<HomeScreen1> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: Image.network(
+            'https://static.vecteezy.com/system/resources/previews/005/064/963/non_2x/letter-p-alphabet-natural-green-icons-leaf-logo-free-vector.jpg',
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomFooter(
