@@ -41,6 +41,21 @@ class _ContractScreenState extends State<LocationScreen> {
     });
   }
 
+  String _formatPrice(double price) {
+    String priceStr = price.toStringAsFixed(0);
+    String result = '';
+    int count = 0;
+
+    for (int i = priceStr.length - 1; i >= 0; i--) {
+      count++;
+      result = priceStr[i] + result;
+      if (count % 3 == 0 && i > 0) {
+        result = '.' + result;
+      }
+    }
+    return result;
+  }
+
   @override
   void dispose() {
     _searchFocusNode.removeListener(_onFocusChange);
@@ -243,11 +258,11 @@ class _ContractScreenState extends State<LocationScreen> {
               Divider(color: Colors.grey.shade300),
               SizedBox(height: 10),
               _infoRow(Icons.attach_money, 'Giá theo giờ',
-                  '${parking.pricePerHour} VND'),
+                  '${_formatPrice(parking.pricePerHour ?? 0)} VND'),
               _infoRow(Icons.calendar_today, 'Giá theo ngày',
-                  '${parking.pricePerDay} VND'),
+                  '${_formatPrice(parking.pricePerDay ?? 0)} VND'),
               _infoRow(Icons.calendar_month, 'Giá theo tháng',
-                  '${parking.pricePerMonth} VND'),
+                  '${_formatPrice(parking.pricePerMonth ?? 0)} VND'),
               Spacer(),
               SizedBox(
                 height: 38,
