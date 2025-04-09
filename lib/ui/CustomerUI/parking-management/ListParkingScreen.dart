@@ -20,6 +20,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
   bool isLoadingCars = true;
   String? errorMessage;
   final DataService _dataService = DataService();
+  DateTime selectedStartDate = DateTime.now(); // Thêm biến để lưu ngày chọn
 
   @override
   void initState() {
@@ -67,15 +68,14 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
 
   Future<void> _fetchAvailableParkingLots() async {
     try {
-      final startDate = DateTime.now();
       final endDate = DateTime(
-        startDate.year,
-        startDate.month + selectedMonthDuration,
-        startDate.day,
+        selectedStartDate.year,
+        selectedStartDate.month + selectedMonthDuration,
+        selectedStartDate.day,
       );
 
       final lots = await _dataService.searchAvailableParkingForContract(
-        startDate: startDate,
+        startDate: selectedStartDate,
         endDate: endDate,
       );
 
@@ -104,13 +104,28 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
     }
   }
 
+  Future<void> _selectStartDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedStartDate,
+      firstDate: DateTime.now(), // Giới hạn ngày nhỏ nhất là hôm nay
+      lastDate: DateTime.now().add(Duration(days: 365)), // Giới hạn 1 năm
+    );
+    if (picked != null && picked != selectedStartDate) {
+      setState(() {
+        selectedStartDate = picked;
+      });
+      await _fetchAvailableParkingLots();
+      _calculateTotalCost();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final startDate = DateTime.now();
     final endDate = DateTime(
-      startDate.year,
-      startDate.month + selectedMonthDuration,
-      startDate.day,
+      selectedStartDate.year,
+      selectedStartDate.month + selectedMonthDuration,
+      selectedStartDate.day,
     );
 
     return Scaffold(
@@ -155,32 +170,58 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                   SizedBox(height: 5),
                   Padding(
                     padding: const EdgeInsets.only(left: 28),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '${_formatDate(startDate)} - ${_formatDate(endDate)}',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w700),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () => _selectStartDate(context),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Bắt đầu: ${_formatDate(selectedStartDate)}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.calendar_today, size: 20),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        DropdownButton<int>(
-                          value: selectedMonthDuration,
-                          items: List.generate(12, (index) {
-                            int months = index + 1;
-                            return DropdownMenuItem(
-                              value: months,
-                              child: Text("$months tháng"),
-                            );
-                          }),
-                          onChanged: (value) async {
-                            if (value != null) {
-                              setState(() {
-                                selectedMonthDuration = value;
-                              });
-                              await _fetchAvailableParkingLots();
-                              _calculateTotalCost();
-                            }
-                          },
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Kết thúc: ${_formatDate(endDate)}',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w700),
+                            ),
+                            DropdownButton<int>(
+                              value: selectedMonthDuration,
+                              items: List.generate(12, (index) {
+                                int months = index + 1;
+                                return DropdownMenuItem(
+                                  value: months,
+                                  child: Text("$months tháng"),
+                                );
+                              }),
+                              onChanged: (value) async {
+                                if (value != null) {
+                                  setState(() {
+                                    selectedMonthDuration = value;
+                                  });
+                                  await _fetchAvailableParkingLots();
+                                  _calculateTotalCost();
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -281,7 +322,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
               height: 40,
               child: ElevatedButton(
                 onPressed: (selectedParking != null && selectedCar != null)
-                    ? () => _onSubmit(startDate, endDate)
+                    ? () => _onSubmit(selectedStartDate, endDate)
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: (selectedParking != null && selectedCar != null)
@@ -388,12 +429,10 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
   Future<void> _onSubmit(DateTime startDate, DateTime endDate) async {
     if (selectedParking != null && selectedCar != null) {
       try {
-        // Show loading indicator
         setState(() {
           isLoading = true;
         });
 
-        // Call API to add contract
         final contract = await _dataService.addContract(
           carId: selectedCar!.carId,
           parkingLotId: selectedParking!.parkingLotId,
@@ -402,23 +441,18 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
           note: "Đăng ký hợp đồng",
         );
 
-        // Hide loading indicator
         setState(() {
           isLoading = false;
         });
 
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Hợp đồng đã được gửi thành công!")),
         );
 
-        // Navigate to ContractScreen
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ContractScreen(
-              // You can pass the contract object if ContractScreen accepts it
-            ),
+            builder: (context) => ContractScreen(),
           ),
         );
       } catch (e) {

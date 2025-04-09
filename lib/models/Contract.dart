@@ -13,7 +13,7 @@ class Contract {
   final double long;
   final String note;
   final Car car;
-  final int paymentContractId; // Changed from PaymentContract? to int
+  final int paymentContractId;
 
   Contract({
     required this.contractId,
