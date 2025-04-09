@@ -10,9 +10,7 @@ class NewVehicleScreen extends StatefulWidget {
 }
 
 class _NewVehicleScreenState extends State<NewVehicleScreen> {
-  final TextEditingController _brandController =
-      TextEditingController(text: "");
-
+  final TextEditingController _brandController = TextEditingController(text: "");
   final DataService _dataService = DataService();
   File? _image;
   final _formKey = GlobalKey<FormState>();
@@ -30,8 +28,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   final List<String> _brands = ["BMW", "Mercedes", "Toyota", "Honda", "Ford"];
 
   Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -42,10 +39,13 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Create new car object
+        // Lấy customerId từ DataService (gọi phương thức public)
+        final customerId = await _dataService.getCustomerId();
+
+        // Create new car object với customerId đã lấy được
         final newCar = Car(
           carId: 0, // Will be assigned by server
-          customerId: 1, // Temporary hardcoded customerId
+          customerId: customerId, // Sử dụng customerId từ DataService
           model: '${_brandController.text} ${_modelController.text}',
           color: _colorController.text,
           licensePlate: _plateController.text,
@@ -65,8 +65,9 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
         Navigator.pop(context, true); // Return success status
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi khi thêm xe: ${e.toString()}')),
+          SnackBar(content: Text('Thêm xe thất bại')),
         );
+        print("Lỗi khi thêm xe: ${e.toString()}");
       }
     }
   }
@@ -107,28 +108,27 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                     ),
                     child: _image == null
                         ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt,
-                                  size: 100, color: Colors.grey),
-                              const SizedBox(height: 8),
-                              const Text(
-                                "Chọn hình ảnh",
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          )
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 100, color: Colors.grey),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Chọn hình ảnh",
+                          style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )
                         : ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.file(_image!, fit: BoxFit.cover),
-                          ),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(_image!, fit: BoxFit.cover),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30),
 
-                // Brand Dropdown
+                // Brand TextField
                 _buildTextField(
                   "Hãng xe",
                   _brandController,
@@ -139,7 +139,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
 
                 // Model TextField
@@ -254,12 +253,12 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   }
 
   Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    int maxLines = 1,
-    String? hintText,
-    String? Function(String?)? validator,
-  }) {
+      String label,
+      TextEditingController controller, {
+        int maxLines = 1,
+        String? hintText,
+        String? Function(String?)? validator,
+      }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -273,11 +272,11 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   }
 
   Widget _buildDropdownField(
-    String label,
-    String value,
-    ValueChanged<String?> onChanged,
-    List<String> items,
-  ) {
+      String label,
+      String value,
+      ValueChanged<String?> onChanged,
+      List<String> items,
+      ) {
     return DropdownButtonFormField<String>(
       value: value,
       items: items.map((brand) {
