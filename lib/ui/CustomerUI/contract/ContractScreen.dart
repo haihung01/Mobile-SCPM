@@ -184,10 +184,8 @@ class _ContractScreenState extends State<ContractScreen> {
   }
 
   Widget _buildContractCard(Contract contract) {
-    // Kiểm tra nếu đang ở tab "Đang Hoạt Động" (index 2)
-    final isActiveTab = selectedTabIndex == 2;
-    final statusText = isActiveTab ? 'Đang hoạt động' : _getStatusText(contract.status);
-    final statusColor = isActiveTab ? Colors.blue : _getStatusColor(contract.status);
+    final statusText = _getStatusText(contract.status);
+    final statusColor = _getStatusColor(contract.status);
     final buttonLabel = _getButtonLabel(contract);
 
     return Card(
@@ -311,7 +309,7 @@ class _ContractScreenState extends State<ContractScreen> {
         return 'Từ chối';
       case 'Paid':
         return 'Đã thanh toán';
-      case 'Activated':
+      case 'Active':
         return 'Đang hoạt động';
       default:
         return status;
@@ -328,7 +326,7 @@ class _ContractScreenState extends State<ContractScreen> {
         return Colors.red;
       case 'Paid':
         return Colors.purple;
-      case 'Activated':
+      case 'Active':
         return Colors.blue;
       default:
         return Colors.grey;

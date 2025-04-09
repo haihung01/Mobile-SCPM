@@ -34,7 +34,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   }
 
   Future<void> _openMap(double lat, double long) async {
-    // Try different URL schemes in order of preference
     final String geoUrl = '${UrlConstant.GOOGLE_MAPS_GEO}$lat,$long';
     final String googleMapsAppUrl = '${UrlConstant.GOOGLE_MAPS_APP}$lat,$long';
     final String googleMapsWebUrl = '${UrlConstant.GOOGLE_MAPS_WEB}$lat,$long';
@@ -44,7 +43,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
     final Uri googleMapsWebUri = Uri.parse(googleMapsWebUrl);
 
     try {
-      // Try the geo: scheme first (works on both Android and iOS)
       print('Trying geo URL: $geoUrl');
       if (await canLaunchUrl(geoUri)) {
         print('Launching geo URL...');
@@ -56,7 +54,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         return;
       }
 
-      // Try the Google Maps app URL
       print('Geo URL not available, trying Google Maps app URL: $googleMapsAppUrl');
       if (await canLaunchUrl(googleMapsAppUri)) {
         print('Launching Google Maps app...');
@@ -68,7 +65,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         return;
       }
 
-      // Fallback to web URL
       print('Google Maps app not available, falling back to web URL: $googleMapsWebUrl');
       if (await canLaunchUrl(googleMapsWebUri)) {
         print('Launching web URL...');
@@ -108,7 +104,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Thông tin hợp đồng
             Container(
               padding: EdgeInsets.all(16),
               decoration: _boxDecoration(),
@@ -132,6 +127,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   SizedBox(height: 12),
                   _buildInfoRow("Mã hợp đồng:", widget.contract.contractId.toString()),
                   _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.status)),
+                  if(widget.contract.status == "Rejected")
+                  _buildInfoRow("Lý do:", _getStatusText(widget.contract.note)),
                 ],
               ),
             ),

@@ -20,7 +20,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
   bool isLoadingCars = true;
   String? errorMessage;
   final DataService _dataService = DataService();
-  DateTime selectedStartDate = DateTime.now(); // Thêm biến để lưu ngày chọn
+  DateTime selectedStartDate = DateTime.now();
 
   @override
   void initState() {
@@ -95,7 +95,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
     if (selectedParking != null && selectedParking!.pricePerMonth != null) {
       final cost = selectedParking!.pricePerMonth! * selectedMonthDuration;
       setState(() {
-        totalCost = '${cost.toStringAsFixed(0)}đ';
+        totalCost = '${_formatPrice(cost)}đ';
       });
     } else {
       setState(() {
@@ -108,8 +108,8 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedStartDate,
-      firstDate: DateTime.now(), // Giới hạn ngày nhỏ nhất là hôm nay
-      lastDate: DateTime.now().add(Duration(days: 365)), // Giới hạn 1 năm
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
     );
     if (picked != null && picked != selectedStartDate) {
       setState(() {
@@ -118,6 +118,22 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
       await _fetchAvailableParkingLots();
       _calculateTotalCost();
     }
+  }
+
+  // Hàm định dạng giá tiền
+  String _formatPrice(double price) {
+    String priceStr = price.toStringAsFixed(0);
+    String result = '';
+    int count = 0;
+
+    for (int i = priceStr.length - 1; i >= 0; i--) {
+      count++;
+      result = priceStr[i] + result;
+      if (count % 3 == 0 && i > 0) {
+        result = '.' + result;
+      }
+    }
+    return result;
   }
 
   @override
@@ -398,7 +414,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                     Icon(Icons.attach_money, color: Colors.green, size: 16),
                     SizedBox(width: 4),
                     Text(
-                      '${parking.pricePerMonth?.toStringAsFixed(0) ?? 'N/A'}đ/tháng',
+                      '${_formatPrice(parking.pricePerMonth ?? 0)}đ/tháng',
                       style: TextStyle(fontSize: 14),
                     ),
                   ],
