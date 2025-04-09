@@ -1,6 +1,7 @@
 import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractDetailScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/parking-management/ListParkingScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/payment/PaymentScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,11 @@ class _ContractScreenState extends State<ContractScreen> {
         final pendingContracts = await _dataService.getPendingContracts();
         final approvedContracts = await _dataService.getApprovedContracts();
         final rejectedContracts = await _dataService.getRejectedContracts();
-        return [...pendingContracts, ...approvedContracts, ...rejectedContracts];
+        return [
+          ...pendingContracts,
+          ...approvedContracts,
+          ...rejectedContracts
+        ];
       } else if (tabIndex == 1) {
         // "Đã Thanh Toán" tab
         return await _dataService.getPaidContracts();
@@ -116,9 +121,29 @@ class _ContractScreenState extends State<ContractScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) => ListParkingScreen(),
+          );
+        },
         backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
+        shape: const CircleBorder(),
+        child: Container(
+          alignment: Alignment.center,
+          width: double.infinity,
+          height: double.infinity,
+          child: const Text(
+            "Soạn",
+            style: TextStyle(
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomFooter(
@@ -173,7 +198,8 @@ class _ContractScreenState extends State<ContractScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: const Icon(Icons.directions_car, size: 40, color: Colors.grey),
+              child: const Icon(Icons.directions_car,
+                  size: 40, color: Colors.grey),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -256,7 +282,8 @@ class _ContractScreenState extends State<ContractScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               child: Text(
                 buttonLabel,
