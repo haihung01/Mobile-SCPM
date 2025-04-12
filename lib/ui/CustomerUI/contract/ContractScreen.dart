@@ -31,7 +31,6 @@ class _ContractScreenState extends State<ContractScreen> {
   Future<List<Contract>> _fetchContractsForTab(int tabIndex) async {
     try {
       if (tabIndex == 0) {
-        // Combine Pending, Approved, and Rejected contracts for "Chưa Thanh Toán"
         final pendingContracts = await _dataService.getPendingContracts();
         final approvedContracts = await _dataService.getApprovedContracts();
         final rejectedContracts = await _dataService.getRejectedContracts();

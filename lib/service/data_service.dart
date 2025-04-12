@@ -434,4 +434,55 @@ class DataService {
       throw Exception('Error occurred: $e');
     }
   }
+
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String phone,
+    required String email,
+    required String username,
+    required String password,
+  }) async {
+    try {
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Customer/Register');
+      print('[API] Request body: {'
+          '"firstName": "$firstName", '
+          '"lastName": "$lastName", '
+          '"phone": "$phone", '
+          '"email": "$email", '
+          '"username": "$username", '
+          '"password": "$password"}');
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Customer/Register',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          validateStatus: (status) {
+            return status! < 500; // Chấp nhận tất cả status code dưới 500
+          },
+        ),
+        data: {
+          'firstName': firstName,
+          'lastName': lastName,
+          'phone': phone,
+          'email': email,
+          'username': username,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        print('[API] Error response: ${response.data}');
+        final errorMessage = response.data['message'] ?? 'Đăng ký thất bại';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print('[API] Exception: $e');
+      throw Exception(e.toString().contains('Exception') ? e.toString().replaceFirst('Exception: ', '') : 'Đăng ký thất bại: ${e.toString()}');
+    }
+  }
+
 }

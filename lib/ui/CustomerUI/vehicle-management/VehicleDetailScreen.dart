@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/service/data_service.dart';
+import 'package:flutter/services.dart';
 
 class VehicleDetailsScreen extends StatefulWidget {
   final int carId;
@@ -24,32 +25,76 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     _futureCar = _dataService.getCarById(widget.carId);
   }
 
+  String _formatLicensePlate(String value) {
+    String cleaned = value.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
+    if (cleaned.length >= 3) {
+      String prefix = cleaned.substring(0, 2);
+      String letter = cleaned.length > 2 ? cleaned[2].toUpperCase() : '';
+      String numbers = cleaned.length > 3 ? cleaned.substring(3) : '';
+      if (letter.isNotEmpty && !RegExp(r'[A-Za-z]').hasMatch(letter)) {
+        letter = '';
+        numbers = cleaned.substring(2);
+      }
+      String firstPart = numbers.length >= 3 ? numbers.substring(0, numbers.length > 3 ? 3 : numbers.length) : numbers;
+      String secondPart = numbers.length > 3 ? numbers.substring(3, numbers.length > 5 ? 5 : numbers.length) : '';
+      String formatted = prefix;
+      if (letter.isNotEmpty) {
+        formatted += letter;
+      }
+      if (firstPart.isNotEmpty) {
+        formatted += '-$firstPart';
+      }
+      if (secondPart.isNotEmpty) {
+        formatted += '.$secondPart';
+      }
+      return formatted.toUpperCase();
+    }
+    return cleaned.toUpperCase();
+  }
+
+  // Hàm xử lý cập nhật xe
+  Future<void> _updateCar() async {
+    if (_formKey.currentState!.validate()) {
+      // Định dạng lại biển số xe trước khi gửi
+      _editableCar = _editableCar.copyWith(
+        licensePlate: _formatLicensePlate(_editableCar.licensePlate),
+      );
+
+      try {
+        // Thực hiện cập nhật bất đồng bộ
+        final updatedCar = await _dataService.updateCar(_editableCar);
+
+        // Sau khi cập nhật thành công, gọi setState đồng bộ
+        setState(() {
+          _isEditing = false;
+          _futureCar = Future.value(updatedCar);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cập nhật thành công')),
+        );
+      } catch (e) {
+        print('Lỗi khi cập nhật: ${e.toString()}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cập nhật thất bại')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title:
-            Text('Thông tin xe', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Thông tin xe', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.green.shade700,
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
-            onPressed: () async {
+            onPressed: () {
               if (_isEditing) {
-                if (_formKey.currentState!.validate()) {
-                  setState(() => _isEditing = false);
-                  try {
-                    final updatedCar =
-                        await _dataService.updateCar(_editableCar);
-                    setState(() => _futureCar = Future.value(updatedCar));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Cập nhật thành công')),
-                    );
-                  } catch (e) {
-                    print('Lỗi khi cập nhật: ${e.toString()}');
-                  }
-                }
+                _updateCar();
               } else {
                 setState(() => _isEditing = true);
               }
@@ -109,8 +154,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         _infoTile('Model', car.model),
         _infoTile('Biển số', car.licensePlate),
         _infoTile('Màu sắc', car.color),
-        _infoTile('Ngày đăng ký', car.registedDate),
+        // _infoTile('Ngày đăng ký', car.registedDate),
         _infoTile('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
+        if (car.entrance != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Vị trí đỗ xe',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          _infoTile('Tầng', car.entrance!.floorName),
+          _infoTile('Khu vực', car.entrance!.areaName),
+          _infoTile('Bãi đỗ', car.entrance!.parkingLotName),
+          _infoTile('Vị trí đỗ', car.entrance!.parkingSpaceName),
+        ],
       ],
     );
   }
@@ -131,19 +189,40 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       child: Column(
         children: [
           _textField('Model', _editableCar.model,
-              (value) => _editableCar = _editableCar.copyWith(model: value)),
+                  (value) => _editableCar = _editableCar.copyWith(model: value)),
           _textField(
-              'Biển số',
-              _editableCar.licensePlate,
-              (value) =>
-                  _editableCar = _editableCar.copyWith(licensePlate: value)),
+            'Biển số',
+            _editableCar.licensePlate,
+                (value) => _editableCar = _editableCar.copyWith(licensePlate: value),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+              LengthLimitingTextInputFormatter(8),
+              TextInputFormatter.withFunction((oldValue, newValue) {
+                String formatted = _formatLicensePlate(newValue.text);
+                return TextEditingValue(
+                  text: formatted,
+                  selection: TextSelection.collapsed(offset: formatted.length),
+                );
+              }),
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập biển số xe';
+              }
+              final platePattern = RegExp(r'^\d{2}[A-Za-z]-\d{3}\.\d{2}$');
+              if (!platePattern.hasMatch(value)) {
+                return 'Biển số xe không đúng định dạng (VD: XXA-XXX.XX)';
+              }
+              return null;
+            },
+          ),
           _textField('Màu sắc', _editableCar.color,
-              (value) => _editableCar = _editableCar.copyWith(color: value)),
+                  (value) => _editableCar = _editableCar.copyWith(color: value)),
           SwitchListTile(
             title: Text('Trạng thái hoạt động'),
             value: _editableCar.status,
             onChanged: (value) => setState(
-                () => _editableCar = _editableCar.copyWith(status: value)),
+                    () => _editableCar = _editableCar.copyWith(status: value)),
           ),
         ],
       ),
@@ -151,7 +230,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   }
 
   Widget _textField(
-      String label, String initialValue, Function(String) onChanged) {
+      String label,
+      String initialValue,
+      Function(String) onChanged, {
+        List<TextInputFormatter>? inputFormatters,
+        String? Function(String?)? validator,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -162,8 +246,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           filled: true,
           fillColor: Colors.white,
         ),
-        validator: (value) =>
-            value == null || value.isEmpty ? 'Không được bỏ trống' : null,
+        inputFormatters: inputFormatters,
+        validator: validator ?? (value) => value == null || value.isEmpty ? 'Không được bỏ trống' : null,
         onChanged: onChanged,
       ),
     );

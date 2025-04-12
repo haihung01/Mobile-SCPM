@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/models/car_model.dart';
+import 'package:flutter/services.dart';
 
 class NewVehicleScreen extends StatefulWidget {
   @override
@@ -36,9 +37,65 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
     }
   }
 
+  // Hàm định dạng biển số xe
+  String _formatLicensePlate(String value) {
+    String cleaned = value.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
+    if (cleaned.length >= 3) {
+      String prefix = cleaned.substring(0, 2);
+      String letter = cleaned.length > 2 ? cleaned[2].toUpperCase() : '';
+      String numbers = cleaned.length > 3 ? cleaned.substring(3) : '';
+      if (letter.isNotEmpty && !RegExp(r'[A-Za-z]').hasMatch(letter)) {
+        letter = '';
+        numbers = cleaned.substring(2);
+      }
+      String firstPart = numbers.length >= 3 ? numbers.substring(0, numbers.length > 3 ? 3 : numbers.length) : numbers;
+      String secondPart = numbers.length > 3 ? numbers.substring(3, numbers.length > 5 ? 5 : numbers.length) : '';
+      String formatted = prefix;
+      if (letter.isNotEmpty) {
+        formatted += letter;
+      }
+      if (firstPart.isNotEmpty) {
+        formatted += '-$firstPart';
+      }
+      if (secondPart.isNotEmpty) {
+        formatted += '.$secondPart';
+      }
+      return formatted.toUpperCase();
+    }
+    return cleaned.toUpperCase();
+  }
+
+  // Hàm định dạng ngày tháng
+  String _formatDate(String value) {
+    String cleaned = value.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cleaned.length >= 2) {
+      String day = cleaned.substring(0, 2);
+      String month = cleaned.length > 2 ? cleaned.substring(2, cleaned.length > 4 ? 4 : cleaned.length) : '';
+      String year = cleaned.length > 4 ? cleaned.substring(4, cleaned.length > 8 ? 8 : cleaned.length) : '';
+
+      String formatted = day;
+      if (month.isNotEmpty) {
+        formatted += '/$month';
+      }
+      if (year.isNotEmpty) {
+        formatted += '/$year';
+      }
+      return formatted;
+    }
+    return cleaned;
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       try {
+        // Định dạng lại biển số xe trước khi gửi
+        String formattedPlate = _formatLicensePlate(_plateController.text);
+        _plateController.text = formattedPlate;
+
+        // Định dạng lại ngày tháng trước khi gửi
+        String formattedDate = _formatDate(_dateController.text);
+        _dateController.text = formattedDate;
+
         // Lấy customerId từ DataService (gọi phương thức public)
         final customerId = await _dataService.getCustomerId();
 
@@ -48,8 +105,8 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
           customerId: customerId, // Sử dụng customerId từ DataService
           model: '${_brandController.text} ${_modelController.text}',
           color: _colorController.text,
-          licensePlate: _plateController.text,
-          registedDate: _dateController.text,
+          licensePlate: formattedPlate, // Sử dụng giá trị đã định dạng
+          registedDate: formattedDate, // Sử dụng giá trị đã định dạng
           status: _status,
           contracts: [],
           customer: null,
@@ -158,9 +215,24 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                 _buildTextField(
                   "Biển số xe",
                   _plateController,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                    LengthLimitingTextInputFormatter(8),
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      String formatted = _formatLicensePlate(newValue.text);
+                      return TextEditingValue(
+                        text: formatted,
+                        selection: TextSelection.collapsed(offset: formatted.length),
+                      );
+                    }),
+                  ],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập biển số xe';
+                    }
+                    final platePattern = RegExp(r'^\d{2}[A-Za-z]-\d{3}\.\d{2}$');
+                    if (!platePattern.hasMatch(value)) {
+                      return 'Biển số xe không đúng định dạng (VD: XXA-XXX.XX)';
                     }
                     return null;
                   },
@@ -176,9 +248,38 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                         "Ngày đăng ký",
                         _dateController,
                         hintText: "dd/mm/YYYY",
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(8), // Giới hạn 8 chữ số (23092002)
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            String formatted = _formatDate(newValue.text);
+                            return TextEditingValue(
+                              text: formatted,
+                              selection: TextSelection.collapsed(offset: formatted.length),
+                            );
+                          }),
+                        ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Vui lòng nhập ngày đăng ký';
+                          }
+                          final datePattern = RegExp(r'^\d{2}/\d{2}/\d{4}$');
+                          if (!datePattern.hasMatch(value)) {
+                            return 'Ngày không đúng định dạng (VD: dd/mm/YYYY)';
+                          }
+                          // Kiểm tra ngày hợp lệ
+                          final parts = value.split('/');
+                          final day = int.tryParse(parts[0]) ?? 0;
+                          final month = int.tryParse(parts[1]) ?? 0;
+                          final year = int.tryParse(parts[2]) ?? 0;
+                          if (day < 1 || day > 31) {
+                            return 'Ngày phải từ 01 đến 31';
+                          }
+                          if (month < 1 || month > 12) {
+                            return 'Tháng phải từ 01 đến 12';
+                          }
+                          if (year < 1900 || year > DateTime.now().year) {
+                            return 'Năm không hợp lệ';
                           }
                           return null;
                         },
@@ -258,10 +359,12 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
         int maxLines = 1,
         String? hintText,
         String? Function(String?)? validator,
+        List<TextInputFormatter>? inputFormatters,
       }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,

@@ -1,3 +1,4 @@
+import 'package:fe_capstone/ui/screens/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
@@ -21,7 +22,6 @@ class _LoginScreen1State extends State<LoginScreen1> {
         _passwordController.text,
       );
 
-      // Lưu trạng thái đăng nhập
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
 
@@ -112,15 +112,29 @@ class _LoginScreen1State extends State<LoginScreen1> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    "Quên mật khẩu ?",
-                    style: TextStyle(color: Colors.green, fontSize: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      "Quên mật khẩu ?",
+                      style: TextStyle(color: Colors.green, fontSize: 14),
+                    ),
                   ),
-                ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterScreen()),
+                      );
+                    },
+                    child: const Text(
+                      "Đăng ký",
+                      style: TextStyle(color: Colors.green, fontSize: 14),
+                    ),
+                  ),
+                ],
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -130,11 +144,13 @@ class _LoginScreen1State extends State<LoginScreen1> {
                       borderRadius: BorderRadius.circular(25)),
                 ),
                 onPressed: _login,
-                child: const Text("Đăng nhập",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
+                child: const Text(
+                  "Đăng nhập",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),

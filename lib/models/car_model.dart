@@ -1,3 +1,5 @@
+import 'package:fe_capstone/models/entrance_model.dart';
+
 class Car {
   final int carId;
   final int customerId;
@@ -8,6 +10,7 @@ class Car {
   final bool status;
   final List<dynamic> contracts;
   final dynamic customer;
+  final Entrance? entrance; // Thêm trường entrance
 
   Car({
     required this.carId,
@@ -19,6 +22,7 @@ class Car {
     required this.status,
     required this.contracts,
     required this.customer,
+    this.entrance, // entrance là tùy chọn (nullable)
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,9 @@ class Car {
       status: json['status'] as bool? ?? false,
       contracts: json['contracts'] as List<dynamic>? ?? [],
       customer: json['customer'],
+      entrance: json['entrance'] != null
+          ? Entrance.fromJson(json['entrance'] as Map<String, dynamic>)
+          : null, // Xử lý entrance từ JSON
     );
   }
 
@@ -46,10 +53,10 @@ class Car {
       'status': status,
       'contracts': contracts,
       'customer': customer,
+      'entrance': entrance?.toJson(), // Chuyển entrance thành JSON
     };
   }
 
-  // Thêm vào Car model
   Car copyWith({
     int? carId,
     int? customerId,
@@ -60,6 +67,7 @@ class Car {
     bool? status,
     List<dynamic>? contracts,
     dynamic customer,
+    Entrance? entrance, // Thêm entrance vào copyWith
   }) {
     return Car(
       carId: carId ?? this.carId,
@@ -71,7 +79,7 @@ class Car {
       status: status ?? this.status,
       contracts: contracts ?? this.contracts,
       customer: customer ?? this.customer,
+      entrance: entrance ?? this.entrance,
     );
   }
 }
-

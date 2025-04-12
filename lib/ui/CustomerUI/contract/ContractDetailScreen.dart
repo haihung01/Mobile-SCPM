@@ -127,7 +127,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   SizedBox(height: 12),
                   _buildInfoRow("Mã hợp đồng:", widget.contract.contractId.toString()),
                   _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.status)),
-                  if(widget.contract.status == "Rejected")
                   _buildInfoRow("Lý do:", _getStatusText(widget.contract.note)),
                 ],
               ),
