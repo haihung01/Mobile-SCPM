@@ -118,7 +118,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
                   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
-                  height: 128,
+                  height: 115,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
@@ -128,7 +128,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 vehicle.model,
                 style:

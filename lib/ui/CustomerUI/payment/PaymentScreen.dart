@@ -1,6 +1,11 @@
+import 'package:dio/dio.dart';
+import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/models/Contract.dart';
+import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/payment/QRScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:fe_capstone/ui/CustomerUI/payment/Vnpay.dart';
+import 'package:url_launcher/url_launcher.dart'; // Đường dẫn đúng tới file VNPayService của bạn
 
 class PaymentScreen extends StatefulWidget {
   final Contract contract;
@@ -22,7 +27,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Thanh toán",
+          "Trang thanh toán",
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
@@ -108,15 +113,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
               width: 250,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QRScreen(
-                              paymentContractId:
-                                  widget.contract.paymentContractId,
-                            )),
-                  );
+                onPressed: () async {
+                  final int contractId = widget.contract.paymentContractId;
+                  final dataService = DataService();
+                  await dataService.redirectToVNPay(contractId);
+
+                  // Sau khi user thanh toán xong và quay lại app,
+                  // bạn có thể show 1 màn hình kết quả xác nhận thanh toán thủ công.
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -124,7 +127,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     borderRadius: BorderRadius.circular(18),
                   ),
                 ),
-                child: const Text("Thanh Toán",
+                child: const Text("Thanh toán",
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),

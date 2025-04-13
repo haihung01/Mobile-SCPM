@@ -6,7 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 class UrlConstant {
   static const GOOGLE_MAPS_GEO = 'geo:';
   static const GOOGLE_MAPS_APP = 'google.navigation:q=';
-  static const GOOGLE_MAPS_WEB = 'https://www.google.com/maps/search/?api=1&query=';
+  static const GOOGLE_MAPS_WEB =
+      'https://www.google.com/maps/search/?api=1&query=';
 }
 
 class ContractDetailScreen extends StatefulWidget {
@@ -54,7 +55,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         return;
       }
 
-      print('Geo URL not available, trying Google Maps app URL: $googleMapsAppUrl');
+      print(
+          'Geo URL not available, trying Google Maps app URL: $googleMapsAppUrl');
       if (await canLaunchUrl(googleMapsAppUri)) {
         print('Launching Google Maps app...');
         await launchUrl(
@@ -65,7 +67,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         return;
       }
 
-      print('Google Maps app not available, falling back to web URL: $googleMapsWebUrl');
+      print(
+          'Google Maps app not available, falling back to web URL: $googleMapsWebUrl');
       if (await canLaunchUrl(googleMapsWebUri)) {
         print('Launching web URL...');
         await launchUrl(
@@ -112,7 +115,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.description, color: Colors.grey[700], size: 20),
+                      Icon(Icons.description,
+                          color: Colors.grey[700], size: 20),
                       SizedBox(width: 8),
                       Text(
                         "Thông tin hợp đồng",
@@ -125,8 +129,10 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                     ],
                   ),
                   SizedBox(height: 12),
-                  _buildInfoRow("Mã hợp đồng:", widget.contract.contractId.toString()),
-                  _buildInfoRow("Trạng thái:", _getStatusText(widget.contract.status)),
+                  _buildInfoRow(
+                      "Mã hợp đồng:", widget.contract.contractId.toString()),
+                  _buildInfoRow(
+                      "Trạng thái:", _getStatusText(widget.contract.status)),
                   _buildInfoRow("Lý do:", _getStatusText(widget.contract.note)),
                 ],
               ),
@@ -142,7 +148,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.access_time, color: Colors.grey[700], size: 20),
+                      Icon(Icons.access_time,
+                          color: Colors.grey[700], size: 20),
                       SizedBox(width: 8),
                       Text(
                         "Thời gian để xe",
@@ -155,8 +162,10 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                     ],
                   ),
                   SizedBox(height: 12),
-                  _buildInfoRow("Từ ngày:", _formatDate(widget.contract.startDate)),
-                  _buildInfoRow("Đến ngày:", _formatDate(widget.contract.endDate)),
+                  _buildInfoRow(
+                      "Từ ngày:", _formatDate(widget.contract.startDate)),
+                  _buildInfoRow(
+                      "Đến ngày:", _formatDate(widget.contract.endDate)),
                   SizedBox(height: 8),
                 ],
               ),
@@ -182,7 +191,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   ),
                   SizedBox(height: 12),
                   _buildInfoRow("Biển số:", widget.contract.car.licensePlate),
-                  _buildInfoRow("Màu sắc:", widget.contract.car.color ?? 'Không có thông tin'),
+                  _buildInfoRow("Màu sắc:",
+                      widget.contract.car.color ?? 'Không có thông tin'),
                   _buildInfoRow("Model:", widget.contract.car.model),
                   Divider(height: 24, thickness: 1),
                   Row(
@@ -235,7 +245,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
     );
   }
 
-  Widget _buildParkingCard(String title, String address, String space, double lat, double long) {
+  Widget _buildParkingCard(
+      String title, String address, String space, double lat, double long) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -263,7 +274,8 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
                 Row(
                   children: [
@@ -325,6 +337,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         return 'Đã thanh toán';
       case 'Activated':
         return 'Đang hoạt động';
+
       default:
         return status;
     }
