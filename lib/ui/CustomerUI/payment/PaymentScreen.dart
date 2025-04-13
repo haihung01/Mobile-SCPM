@@ -1,11 +1,7 @@
-import 'package:dio/dio.dart';
-import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/service/data_service.dart';
-import 'package:fe_capstone/ui/CustomerUI/payment/QRScreen.dart';
+import 'package:fe_capstone/ui/screens/PaymentWebViewScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:fe_capstone/ui/CustomerUI/payment/Vnpay.dart';
-import 'package:url_launcher/url_launcher.dart'; // Đường dẫn đúng tới file VNPayService của bạn
 
 class PaymentScreen extends StatefulWidget {
   final Contract contract;
@@ -37,7 +33,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Thời gian để xe
             _buildInfoCard(
               icon: Icons.access_time,
               title: "Thời gian Để xe",
@@ -55,7 +50,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Xe đăng ký
             _buildInfoCard(
               icon: Icons.directions_car,
               title: "Xe đăng ký",
@@ -90,7 +84,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Phương thức thanh toán
             _buildInfoCard(
               icon: Icons.payment,
               title: "Phương thức thanh toán",
@@ -100,7 +93,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(width: 10),
                   const Text("Thanh toán qua VNPAY",
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   const Spacer(),
                   const Icon(Icons.chevron_right),
                 ],
@@ -108,7 +101,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const Spacer(),
 
-            // Nút Thanh Toán
             SizedBox(
               width: 250,
               height: 48,
@@ -116,10 +108,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 onPressed: () async {
                   final int contractId = widget.contract.paymentContractId;
                   final dataService = DataService();
-                  await dataService.redirectToVNPay(contractId);
+                  final url = await dataService.redirectToVNPay(contractId);
 
-                  // Sau khi user thanh toán xong và quay lại app,
-                  // bạn có thể show 1 màn hình kết quả xác nhận thanh toán thủ công.
+                  if (url != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RechargeWebViewScreen(url, contractId),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Không thể tạo URL thanh toán'),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -127,9 +131,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     borderRadius: BorderRadius.circular(18),
                   ),
                 ),
-                child: const Text("Thanh toán",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  "Thanh toán",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],

@@ -457,8 +457,7 @@ class DataService {
     }
   }
 
-  // payment vnpay
-  Future<void> redirectToVNPay(int paymentContractId) async {
+  Future<String?> redirectToVNPay(int paymentContractId) async {
     try {
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Payment/create',
@@ -472,20 +471,44 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final String url = response.data.toString().trim();
-
-        // Mở URL trên trình duyệt
-        if (await launchUrl(Uri.parse(url),
-            mode: LaunchMode.externalApplication)) {
-          print('✅ Mở URL thành công: $url');
-        } else {
-          print('❌ Không thể mở URL');
-        }
+        final String url =
+            "${BaseConstants.BASE_URL}/Payment/create?paymentContractId=$paymentContractId&platform=mobile";
+        print('✅ URL thanh toán: $url');
+        return url; // Trả về URL để sử dụng trong WebView
       } else {
         print('❌ API trả về lỗi: ${response.statusCode}');
+        return null;
       }
     } catch (e) {
       print('❌ Lỗi khi gọi API tạo thanh toán: $e');
+      return null;
+    }
+  }
+
+  Future<String?> checkPaymentSuccess(int paymentContractId) async {
+    try {
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Payment/success',
+        queryParameters: {
+          'paymentContractId': paymentContractId,
+        },
+        options: Options(headers: {
+          'Accept': 'application/json',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final String url =
+            "${BaseConstants.BASE_URL}/Payment/success?paymentContractId=$paymentContractId";
+        print('✅ URL thanh toán thành công: $url');
+        return url;
+      } else {
+        print('❌ API trả về lỗi thanh toán: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('❌ Lỗi khi gọi API tạo thanh toán: $e');
+      return null;
     }
   }
 
