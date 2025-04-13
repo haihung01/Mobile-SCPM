@@ -1,3 +1,4 @@
+import 'package:fe_capstone/ui/screens/ForgotPasswordScreen.dart';
 import 'package:fe_capstone/ui/screens/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/service/data_service.dart';
@@ -116,7 +117,14 @@ class _LoginScreen1State extends State<LoginScreen1> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
                     child: const Text(
                       "Quên mật khẩu ?",
                       style: TextStyle(color: Colors.green, fontSize: 14),
@@ -126,7 +134,8 @@ class _LoginScreen1State extends State<LoginScreen1> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => RegisterScreen()),
                       );
                     },
                     child: const Text(
