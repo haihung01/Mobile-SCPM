@@ -5,6 +5,7 @@ import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/models/customer_model.dart';
 import 'package:fe_capstone/models/parking_lot_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DataService {
   final Dio _dio = Dio();
@@ -49,7 +50,8 @@ class DataService {
   Future<List<Car>> getCarsOfCustomer() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Car/GetCarsOfCustomer?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Car/GetCarsOfCustomer?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Car/GetCarsOfCustomer',
@@ -114,9 +116,11 @@ class DataService {
         final dateParts = car.registedDate.split('/');
         if (dateParts.length == 3) {
           // Giả sử định dạng nhập là dd/mm/yyyy
-          formattedDate = '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
+          formattedDate =
+              '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
         } else {
-          formattedDate = DateTime.now().toIso8601String(); // Mặc định nếu định dạng sai
+          formattedDate =
+              DateTime.now().toIso8601String(); // Mặc định nếu định dạng sai
         }
       } catch (e) {
         formattedDate = DateTime.now().toIso8601String(); // Fallback nếu lỗi
@@ -125,7 +129,8 @@ class DataService {
       // Tạo payload chỉ với các trường server yêu cầu
       final payload = {
         'customerId': customerId,
-        'model': car.model, // Nếu server chỉ cần brand, có thể cần tách từ car.model
+        'model':
+            car.model, // Nếu server chỉ cần brand, có thể cần tách từ car.model
         'color': car.color,
         'licensePlate': car.licensePlate,
         'registedDate': formattedDate,
@@ -142,7 +147,8 @@ class DataService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Car.fromJson(response.data);
       } else {
-        throw Exception('Failed to add car: ${response.statusCode} - ${response.data}');
+        throw Exception(
+            'Failed to add car: ${response.statusCode} - ${response.data}');
       }
     } catch (e) {
       throw Exception('Error adding car: ${e.toString()}');
@@ -186,7 +192,8 @@ class DataService {
   Future<List<Contract>> getCustomerContracts() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer',
@@ -216,7 +223,8 @@ class DataService {
         "endDate": endDate.toIso8601String(),
       };
 
-      print('[API] Calling: ${BaseConstants.BASE_URL}/ParkingLot/SearchAvailablesForContract');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/ParkingLot/SearchAvailablesForContract');
       print('[API] Request data: $requestData');
 
       final response = await _dio.post(
@@ -236,7 +244,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => ParkingLot.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load available parking lots: ${response.statusCode} - ${response.data}');
+        throw Exception(
+            'Failed to load available parking lots: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
       print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
@@ -252,7 +261,8 @@ class DataService {
   Future<List<Contract>> getPendingContracts() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPendingContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPendingContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetPendingContracts',
@@ -264,7 +274,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load pending contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load pending contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -274,7 +285,8 @@ class DataService {
   Future<List<Contract>> getApprovedContracts() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetApprovedContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetApprovedContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetApprovedContracts',
@@ -286,7 +298,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load approved contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load approved contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -296,7 +309,8 @@ class DataService {
   Future<List<Contract>> getPaidContracts() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPaidContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetPaidContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetPaidContracts',
@@ -308,7 +322,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load paid contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load paid contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -318,7 +333,8 @@ class DataService {
   Future<List<Contract>> getActivatedContracts() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetActivatedContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetActivatedContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetActivatedContracts',
@@ -330,7 +346,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load activated contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load activated contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -340,7 +357,8 @@ class DataService {
   Future<List<Contract>> getRejectedContracts() async {
     try {
       final customerId = await getCustomerId();
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetRejectedContracts?customerId=$customerId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetRejectedContracts?customerId=$customerId');
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetRejectedContracts', // Sửa endpoint đúng
@@ -352,7 +370,8 @@ class DataService {
         final List<dynamic> data = response.data;
         return data.map((e) => Contract.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load rejected contracts: ${response.statusCode}');
+        throw Exception(
+            'Failed to load rejected contracts: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
@@ -361,7 +380,8 @@ class DataService {
 
   Future<void> payContract(int paymentContractId) async {
     try {
-      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/Pay/$paymentContractId');
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/Pay/$paymentContractId');
 
       final response = await _dio.post(
         '${BaseConstants.BASE_URL}/Contract/Pay/$paymentContractId',
@@ -417,12 +437,14 @@ class DataService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Contract.fromJson(response.data);
       } else {
-        throw Exception('Failed to add contract: ${response.statusCode} - ${response.data}');
+        throw Exception(
+            'Failed to add contract: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
       print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
       if (e.response?.statusCode == 500) {
-        final errorMessage = e.response?.data['message'] ?? 'Unknown server error';
+        final errorMessage =
+            e.response?.data['message'] ?? 'Unknown server error';
         if (errorMessage.contains('object cycle was detected')) {
           print('Circular reference detected in server response');
           return null;
@@ -432,6 +454,38 @@ class DataService {
     } catch (e) {
       print('Error adding contract: $e');
       throw Exception('Error occurred: $e');
+    }
+  }
+
+  // payment vnpay
+  Future<void> redirectToVNPay(int paymentContractId) async {
+    try {
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Payment/create',
+        queryParameters: {
+          'paymentContractId': paymentContractId,
+          'platform': 'mobile',
+        },
+        options: Options(headers: {
+          'Accept': 'application/json',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final String url = response.data.toString().trim();
+
+        // Mở URL trên trình duyệt
+        if (await launchUrl(Uri.parse(url),
+            mode: LaunchMode.externalApplication)) {
+          print('✅ Mở URL thành công: $url');
+        } else {
+          print('❌ Không thể mở URL');
+        }
+      } else {
+        print('❌ API trả về lỗi: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Lỗi khi gọi API tạo thanh toán: $e');
     }
   }
 
@@ -481,8 +535,9 @@ class DataService {
       }
     } catch (e) {
       print('[API] Exception: $e');
-      throw Exception(e.toString().contains('Exception') ? e.toString().replaceFirst('Exception: ', '') : 'Đăng ký thất bại: ${e.toString()}');
+      throw Exception(e.toString().contains('Exception')
+          ? e.toString().replaceFirst('Exception: ', '')
+          : 'Đăng ký thất bại: ${e.toString()}');
     }
   }
-
 }

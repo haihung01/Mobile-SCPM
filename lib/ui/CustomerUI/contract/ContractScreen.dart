@@ -87,9 +87,9 @@ class _ContractScreenState extends State<ContractScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTabButton("Chưa Thanh Toán", 0),
-                _buildTabButton("Đã Thanh Toán", 1),
-                _buildTabButton("Đang Hoạt Động", 2),
+                _buildTabButton("Chưa thanh toán", 0),
+                _buildTabButton("Đã thanh toán", 1),
+                _buildTabButton("Đang hoạt động", 2),
               ],
             ),
             const SizedBox(height: 16),
@@ -282,7 +282,7 @@ class _ContractScreenState extends State<ContractScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               child: Text(
                 buttonLabel,

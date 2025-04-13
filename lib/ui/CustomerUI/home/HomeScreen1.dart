@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleManagementScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +16,24 @@ class HomeScreen1 extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen1> {
   int _selectedIndex = 0;
+  int _currentBannerIndex = 0;
+  PageController _pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto scroll
+    Timer.periodic(Duration(seconds: 3), (Timer timer) {
+      if (_pageController.hasClients) {
+        int nextPage = (_currentBannerIndex + 1) % 3;
+        _pageController.animateToPage(
+          nextPage,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
 
   Future<bool> _checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
@@ -92,7 +112,8 @@ class _HomeScreenState extends State<HomeScreen1> {
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 20),
-            child: Icon(Icons.notifications_none, color: Colors.black),
+            child: Icon(Icons.notifications_none,
+                color: Color.fromARGB(255, 235, 110, 101)),
           ),
         ],
       ),
@@ -100,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen1> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // 🔝 GridView ở trên
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -108,30 +130,127 @@ class _HomeScreenState extends State<HomeScreen1> {
                 children: [
                   _buildCard(
                     Icons.location_on_outlined,
-                    "Tìm Bãi Đỗ",
+                    "Tìm bãi đỗ",
                     () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => LocationScreen()),
                     ),
+                    iconColor: Colors.green,
                   ),
                   _buildCard(
                     Icons.layers_outlined,
-                    "Hợp Đồng",
+                    "Hợp đồng",
                     () => _handleProtectedNavigation(context, ContractScreen()),
+                    iconColor: Color.fromARGB(255, 235, 217, 59),
                   ),
                   _buildCard(
                     Icons.directions_car_outlined,
                     "Danh sách xe",
                     () => _handleProtectedNavigation(
                         context, VehicleListScreen()),
+                    iconColor: Color.fromARGB(255, 130, 187, 233),
                   ),
                   _buildCard(
                     Icons.notifications_active_outlined,
-                    "Thông Báo",
-                    () {}, // Xử lý thông báo
+                    "Thông báo",
+                    () {},
+                    iconColor: const Color.fromARGB(255, 235, 110, 101),
                   ),
                 ],
               ),
+            ),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Transform.translate(
+                    offset: Offset(0, -55),
+                    child: Text(
+                      'Xem chi tiết',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 58, 58, 58),
+                      ),
+                    ),
+                  ),
+                ),
+                Transform.translate(
+                  offset: Offset(0, -50),
+                  child: SizedBox(
+                    height: 185,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentBannerIndex = index;
+                            });
+                          },
+                          itemCount: 3,
+                          itemBuilder: (context, index) {
+                            final images = [
+                              'https://hungvuongphat.com/wp-content/uploads/2021/07/mo-hinh-bai-giu-xe-thong-minh.jpg',
+                              'https://vending-cdn.kootoro.com/torov-cms/upload/image/1672300550330-d%C3%A1n%20decal%20qu%E1%BA%A3ng%20c%C3%A1o%20%C3%B4%20t%C3%B4.jpg',
+                              'https://bcp.cdnchinhphu.vn/334894974524682240/2022/4/1/b60a911bf638239b911a077c0744ec96-16488114501631594628377.jpg',
+                            ];
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color.fromARGB(255, 197, 197, 197),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 10,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    images[index],
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Positioned(
+                          bottom: 10,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(3, (index) {
+                              return Container(
+                                margin: EdgeInsets.symmetric(horizontal: 4),
+                                width: _currentBannerIndex == index ? 12 : 8,
+                                height: _currentBannerIndex == index ? 12 : 8,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _currentBannerIndex == index
+                                      ? Colors.white
+                                      : Colors.white54,
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -157,7 +276,8 @@ class _HomeScreenState extends State<HomeScreen1> {
     );
   }
 
-  Widget _buildCard(IconData icon, String title, VoidCallback onTap) {
+  Widget _buildCard(IconData icon, String title, VoidCallback onTap,
+      {Color iconColor = Colors.black54}) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -166,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen1> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 50, color: Colors.black54),
+            Icon(icon, size: 50, color: iconColor),
             const SizedBox(height: 10),
             Text(
               title,
