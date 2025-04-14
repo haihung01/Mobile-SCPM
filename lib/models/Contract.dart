@@ -14,6 +14,8 @@ class Contract {
   final String note;
   final Car car;
   final int paymentContractId;
+  final int parkingLotId;
+  final double parkingLotPrice;
 
   Contract({
     required this.contractId,
@@ -29,6 +31,8 @@ class Contract {
     required this.note,
     required this.car,
     required this.paymentContractId,
+    required this.parkingLotId,
+    required this.parkingLotPrice,
   });
 
   factory Contract.fromJson(Map<String, dynamic> json) {
@@ -46,6 +50,8 @@ class Contract {
       note: json['note'] ?? '',
       car: Car.fromJson(json['car'] ?? {}),
       paymentContractId: json['paymentContractId'] ?? 0,
+      parkingLotId: json['parkingLotId'] ?? 0,
+      parkingLotPrice: (json['parkingLotPrice'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -92,7 +98,8 @@ class Contract {
       'note': note,
       'car': car.toJson(),
       'paymentContractId': paymentContractId,
+      'parkingLotId': parkingLotId,
+      'parkingLotPrice': parkingLotPrice,
     };
   }
 }
-

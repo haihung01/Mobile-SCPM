@@ -171,7 +171,8 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.access_time, color: Colors.grey[700], size: 20),
+                      Icon(Icons.access_time,
+                          color: Colors.grey[700], size: 20),
                       SizedBox(width: 8),
                       Text(
                         "Thời gian để xe",
@@ -323,15 +324,15 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                 ),
               )
             else if (parkingLots.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Không có bãi xe nào khả dụng trong khoảng thời gian này',
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              else
-                ...parkingLots.map((parking) => _buildParkingCard(parking)),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Không có bãi xe nào khả dụng trong khoảng thời gian này',
+                  textAlign: TextAlign.center,
+                ),
+              )
+            else
+              ...parkingLots.map((parking) => _buildParkingCard(parking)),
             SizedBox(height: 24),
             SizedBox(
               width: 190,
@@ -341,9 +342,10 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                     ? () => _onSubmit(selectedStartDate, endDate)
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: (selectedParking != null && selectedCar != null)
-                      ? Colors.green
-                      : Colors.grey,
+                  backgroundColor:
+                      (selectedParking != null && selectedCar != null)
+                          ? Colors.green
+                          : Colors.grey,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18)),
                 ),
@@ -367,9 +369,7 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: isSelected
-            ? Border.all(color: Colors.green, width: 2)
-            : null,
+        border: isSelected ? Border.all(color: Colors.green, width: 2) : null,
         boxShadow: [
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
