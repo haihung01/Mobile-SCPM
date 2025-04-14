@@ -117,8 +117,7 @@ class DataService {
           formattedDate =
               '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
         } else {
-          formattedDate =
-              DateTime.now().toIso8601String();
+          formattedDate = DateTime.now().toIso8601String();
         }
       } catch (e) {
         formattedDate = DateTime.now().toIso8601String();
@@ -509,6 +508,42 @@ class DataService {
     }
   }
 
+// api renew contract
+  Future<void> renewContract({
+    required int contractId,
+    required int numberMonth,
+  }) async {
+    try {
+      final requestData = {
+        'contractId': contractId,
+        'numberMonth': numberMonth,
+      };
+
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/Renew');
+      print('[API] Request body: $requestData');
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Contract/Renew',
+        data: requestData,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Gia hạn hợp đồng thành công');
+      } else {
+        throw Exception('Gia hạn thất bại: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Lỗi khi gọi API gia hạn: $e');
+      throw Exception('Lỗi gia hạn: $e');
+    }
+  }
+
   Future<void> register({
     required String firstName,
     required String lastName,
@@ -596,5 +631,4 @@ class DataService {
       throw Exception('Error uploading image: $e');
     }
   }
-
 }

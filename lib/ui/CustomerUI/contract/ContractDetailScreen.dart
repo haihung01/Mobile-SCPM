@@ -1,5 +1,6 @@
 import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/contract/RenewContractDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -221,6 +222,39 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               widget.contract.lat,
               widget.contract.long,
             ),
+
+            // Nút Gia hạn
+            if (widget.contract.status == 'Active') ...[
+              SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RenewScreen(contract: widget.contract),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Gia hạn',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ],
         ),
       ),
