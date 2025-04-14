@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:fe_capstone/models/Contract.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,12 +7,10 @@ import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/models/customer_model.dart';
 import 'package:fe_capstone/models/parking_lot_model.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class DataService {
   final Dio _dio = Dio();
 
-  // Helper method to get customer ID from SharedPreferences (bỏ dấu _ để thành public)
   Future<int> getCustomerId() async {
     final prefs = await SharedPreferences.getInstance();
     final customerId = prefs.getInt('ownerId');
@@ -110,28 +110,25 @@ class DataService {
     try {
       final customerId = await getCustomerId();
 
-      // Chuyển đổi registedDate sang định dạng ISO 8601
       String formattedDate;
       try {
         final dateParts = car.registedDate.split('/');
         if (dateParts.length == 3) {
-          // Giả sử định dạng nhập là dd/mm/yyyy
           formattedDate =
               '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
         } else {
           formattedDate =
-              DateTime.now().toIso8601String(); // Mặc định nếu định dạng sai
+              DateTime.now().toIso8601String();
         }
       } catch (e) {
-        formattedDate = DateTime.now().toIso8601String(); // Fallback nếu lỗi
+        formattedDate = DateTime.now().toIso8601String();
       }
 
-      // Tạo payload chỉ với các trường server yêu cầu
       final payload = {
         'customerId': customerId,
-        'model':
-            car.model, // Nếu server chỉ cần brand, có thể cần tách từ car.model
+        'model': car.model,
         'color': car.color,
+        'thumbnail': car.thumbnail ?? '',
         'licensePlate': car.licensePlate,
         'registedDate': formattedDate,
         'status': car.status,
@@ -563,4 +560,41 @@ class DataService {
           : 'Đăng ký thất bại: ${e.toString()}');
     }
   }
+
+  Future<String> uploadImage(File imageFile) async {
+    try {
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Car/UploadImage');
+      String fileName = imageFile.path.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        'imageFile': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+      });
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Car/UploadImage',
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('✅ Image uploaded successfully: ${response.data}');
+        final responseData = response.data as Map<String, dynamic>;
+        final imageUrl = responseData['pathFull'] as String;
+        return imageUrl;
+      } else {
+        throw Exception('Failed to upload image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error uploading image: $e');
+      throw Exception('Error uploading image: $e');
+    }
+  }
+
 }

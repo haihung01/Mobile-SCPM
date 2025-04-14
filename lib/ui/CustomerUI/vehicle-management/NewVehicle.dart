@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class NewVehicleScreen extends StatefulWidget {
   @override
@@ -14,16 +15,16 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   final TextEditingController _brandController = TextEditingController(text: "");
   final DataService _dataService = DataService();
   File? _image;
+  String? _thumbnailUrl; // Lưu URL của hình ảnh sau khi upload
   final _formKey = GlobalKey<FormState>();
+  bool _isUploading = false; // Trạng thái upload hình ảnh
 
-  // Controllers
   final TextEditingController _modelController = TextEditingController();
   final TextEditingController _plateController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  // Form values
   String _selectedBrand = "BMW";
   bool _status = true;
   final List<String> _brands = ["BMW", "Mercedes", "Toyota", "Honda", "Ford"];
@@ -33,11 +34,32 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        _isUploading = true; // Hiển thị trạng thái đang upload
       });
+
+      try {
+        // Gọi API upload hình ảnh
+        final imageUrl = await _dataService.uploadImage(_image!);
+        setState(() {
+          _thumbnailUrl = imageUrl; // Lưu URL hình ảnh
+          _isUploading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tải hình ảnh thành công!')),
+        );
+      } catch (e) {
+        setState(() {
+          _isUploading = false;
+          _image = null; // Xóa hình ảnh nếu upload thất bại
+          _thumbnailUrl = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tải hình ảnh thất bại: $e')),
+        );
+      }
     }
   }
 
-  // Hàm định dạng biển số xe
   String _formatLicensePlate(String value) {
     String cleaned = value.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
     if (cleaned.length >= 3) {
@@ -65,7 +87,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
     return cleaned.toUpperCase();
   }
 
-  // Hàm định dạng ngày tháng
   String _formatDate(String value) {
     String cleaned = value.replaceAll(RegExp(r'[^0-9]'), '');
     if (cleaned.length >= 2) {
@@ -87,42 +108,47 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      // Kiểm tra nếu đang upload hình ảnh
+      if (_isUploading) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đang tải hình ảnh, vui lòng chờ!')),
+        );
+        return;
+      }
+
       try {
-        // Định dạng lại biển số xe trước khi gửi
         String formattedPlate = _formatLicensePlate(_plateController.text);
         _plateController.text = formattedPlate;
 
-        // Định dạng lại ngày tháng trước khi gửi
         String formattedDate = _formatDate(_dateController.text);
         _dateController.text = formattedDate;
 
-        // Lấy customerId từ DataService (gọi phương thức public)
         final customerId = await _dataService.getCustomerId();
 
-        // Create new car object với customerId đã lấy được
+        // Tạo đối tượng Car với thumbnail
         final newCar = Car(
-          carId: 0, // Will be assigned by server
-          customerId: customerId, // Sử dụng customerId từ DataService
+          carId: 0,
+          customerId: customerId,
           model: '${_brandController.text} ${_modelController.text}',
           color: _colorController.text,
-          licensePlate: formattedPlate, // Sử dụng giá trị đã định dạng
-          registedDate: formattedDate, // Sử dụng giá trị đã định dạng
+          licensePlate: formattedPlate,
+          registedDate: formattedDate,
           status: _status,
           contracts: [],
           customer: null,
+          entrance: null,
+          thumbnail: _thumbnailUrl, // Thêm URL hình ảnh vào thumbnail
         );
 
-        // Call API to add new car
         await _dataService.addCar(newCar);
 
-        // Show success message and return
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Thêm xe thành công!')),
         );
-        Navigator.pop(context, true); // Return success status
+        Navigator.pop(context, true);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thêm xe thất bại')),
+          SnackBar(content: Text('Thêm xe thất bại: $e')),
         );
         print("Lỗi khi thêm xe: ${e.toString()}");
       }
@@ -155,7 +181,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
               children: [
                 // Image Picker
                 GestureDetector(
-                  onTap: _pickImage,
+                  onTap: _isUploading ? null : _pickImage, // Vô hiệu hóa khi đang upload
                   child: Container(
                     height: 200,
                     width: 214,
@@ -163,7 +189,11 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: _image == null
+                    child: _isUploading
+                        ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                        : _image == null
                         ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -177,6 +207,27 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                         ),
                       ],
                     )
+                        : _thumbnailUrl != null
+                        ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl: _thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        width: 214,
+                        height: 200,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.error,
+                            color: Colors.red,
+                            size: 50,
+                          ),
+                        ),
+                      ),
+                    )
                         : ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.file(_image!, fit: BoxFit.cover),
@@ -184,8 +235,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
-                // Brand TextField
                 _buildTextField(
                   "Hãng xe",
                   _brandController,
@@ -197,8 +246,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Model TextField
                 _buildTextField(
                   "Model xe",
                   _modelController,
@@ -210,8 +257,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Plate Number
                 _buildTextField(
                   "Biển số xe",
                   _plateController,
@@ -238,11 +283,8 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Date and Color Row
                 Row(
                   children: [
-                    // Date
                     Expanded(
                       child: _buildTextField(
                         "Ngày đăng ký",
@@ -250,7 +292,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                         hintText: "dd/mm/YYYY",
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(8), // Giới hạn 8 chữ số (23092002)
+                          LengthLimitingTextInputFormatter(8),
                           TextInputFormatter.withFunction((oldValue, newValue) {
                             String formatted = _formatDate(newValue.text);
                             return TextEditingValue(
@@ -267,7 +309,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                           if (!datePattern.hasMatch(value)) {
                             return 'Ngày không đúng định dạng (VD: dd/mm/YYYY)';
                           }
-                          // Kiểm tra ngày hợp lệ
                           final parts = value.split('/');
                           final day = int.tryParse(parts[0]) ?? 0;
                           final month = int.tryParse(parts[1]) ?? 0;
@@ -286,7 +327,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    // Color
                     Expanded(
                       child: _buildTextField(
                         "Màu sắc",
@@ -303,8 +343,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
-                // Status Switch
                 SwitchListTile(
                   title: const Text("Trạng thái hoạt động"),
                   value: _status,
@@ -315,8 +353,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Description
                 _buildTextField(
                   "Mô tả (nếu có)",
                   _descriptionController,
@@ -324,8 +360,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   hintText: "Xe có bị gì không...",
                 ),
                 const SizedBox(height: 20),
-
-                // Submit Button
                 SizedBox(
                   width: 234,
                   height: 50,

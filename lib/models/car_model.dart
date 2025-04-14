@@ -10,7 +10,8 @@ class Car {
   final bool status;
   final List<dynamic> contracts;
   final dynamic customer;
-  final Entrance? entrance; // Thêm trường entrance
+  final Entrance? entrance;
+  final String? thumbnail;
 
   Car({
     required this.carId,
@@ -22,7 +23,8 @@ class Car {
     required this.status,
     required this.contracts,
     required this.customer,
-    this.entrance, // entrance là tùy chọn (nullable)
+    this.entrance,
+    this.thumbnail,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
@@ -38,7 +40,8 @@ class Car {
       customer: json['customer'],
       entrance: json['entrance'] != null
           ? Entrance.fromJson(json['entrance'] as Map<String, dynamic>)
-          : null, // Xử lý entrance từ JSON
+          : null,
+      thumbnail: json['thumbnail'] as String?,
     );
   }
 
@@ -53,7 +56,8 @@ class Car {
       'status': status,
       'contracts': contracts,
       'customer': customer,
-      'entrance': entrance?.toJson(), // Chuyển entrance thành JSON
+      'entrance': entrance?.toJson(),
+      'thumbnail': thumbnail,
     };
   }
 
@@ -67,7 +71,8 @@ class Car {
     bool? status,
     List<dynamic>? contracts,
     dynamic customer,
-    Entrance? entrance, // Thêm entrance vào copyWith
+    Entrance? entrance,
+    String? thumbnail,
   }) {
     return Car(
       carId: carId ?? this.carId,
@@ -80,6 +85,7 @@ class Car {
       contracts: contracts ?? this.contracts,
       customer: customer ?? this.customer,
       entrance: entrance ?? this.entrance,
+      thumbnail: thumbnail ?? this.thumbnail,
     );
   }
 }

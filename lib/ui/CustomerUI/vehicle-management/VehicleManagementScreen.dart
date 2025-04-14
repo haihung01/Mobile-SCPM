@@ -104,6 +104,10 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   }
 
   Widget _buildVehicleCard(BuildContext context, Car vehicle) {
+    // Định nghĩa URL mặc định
+    const String defaultImageUrl =
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s';
+
     return GestureDetector(
       onTap: () => _navigateToDetail(context, vehicle.carId),
       child: Card(
@@ -117,7 +121,9 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
+                  vehicle.thumbnail?.isNotEmpty == true
+                      ? vehicle.thumbnail!
+                      : defaultImageUrl, // Sử dụng thumbnail hoặc default
                   height: 115,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -132,7 +138,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
               Text(
                 vehicle.model,
                 style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
