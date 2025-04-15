@@ -2,6 +2,7 @@ import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/RenewContractDetailScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UrlConstant {
@@ -31,9 +32,11 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
     selectedDate = widget.contract.startDate;
   }
 
-  String get totalCost {
-    return 'Chưa có thông tin thanh toán';
+  String formatCurrency(double amount) {
+    final format = NumberFormat("#,##0", "vi_VN");
+    return format.format(amount);
   }
+
 
   Future<void> _openMap(double lat, double long) async {
     final String geoUrl = '${UrlConstant.GOOGLE_MAPS_GEO}$lat,$long';
@@ -202,11 +205,19 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                       Text("Tổng chi phí",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(totalCost,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.black)),
+                      Text(
+                        widget.contract.status == "Active"
+                            ? (widget.contract.totalAllPayments != null
+                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                            : 'Chưa có thông tin thanh toán')
+                            : (widget.contract.totalAmount != null
+                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                            : 'Chưa có thông tin thanh toán'),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black),
+                      ),
                     ],
                   )
                 ],

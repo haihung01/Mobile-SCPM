@@ -259,6 +259,7 @@ class _ContractScreenState extends State<ContractScreen> {
             ),
             ElevatedButton(
               onPressed: () {
+                print("Data contract: ${contract.toJson()}");
                 if (buttonLabel.toLowerCase() == "thanh toán") {
                   Navigator.push(
                     context,

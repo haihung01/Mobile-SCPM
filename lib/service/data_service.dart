@@ -193,7 +193,7 @@ class DataService {
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer',
-        queryParameters: {'customerId': customerId}, // Sửa lỗi hardcode 1
+        queryParameters: {'customerId': customerId},
         options: Options(headers: {'Accept': 'application/json'}),
       );
 

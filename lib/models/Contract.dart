@@ -9,6 +9,8 @@ class Contract {
   final String parkingSpaceName;
   final String parkingLotName;
   final String parkingLotAddress;
+  final double totalAmount;
+  final double totalAllPayments;
   final double lat;
   final double long;
   final String note;
@@ -24,6 +26,8 @@ class Contract {
     required this.status,
     required this.parkingSpaceId,
     required this.parkingSpaceName,
+    required this.totalAmount,
+    required this.totalAllPayments,
     required this.parkingLotName,
     required this.parkingLotAddress,
     required this.lat,
@@ -45,6 +49,8 @@ class Contract {
       parkingSpaceName: json['parkingSpaceName'] ?? '',
       parkingLotName: json['parkingLotName'] ?? '',
       parkingLotAddress: json['parkingLotAddress'] ?? '',
+      totalAmount: (json['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      totalAllPayments: (json['totalAllPayments'] as num?)?.toDouble() ?? 0.0,
       lat: (json['lat'] as num?)?.toDouble() ?? 0.0,
       long: (json['long'] as num?)?.toDouble() ?? 0.0,
       note: json['note'] ?? '',
@@ -93,6 +99,8 @@ class Contract {
       'parkingSpaceName': parkingSpaceName,
       'parkingLotName': parkingLotName,
       'parkingLotAddress': parkingLotAddress,
+      'totalAmount': totalAmount,
+      'totalAllPayments': totalAllPayments,
       'lat': lat,
       'long': long,
       'note': note,

@@ -2,6 +2,7 @@ import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/screens/PaymentWebViewScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Contract contract;
@@ -12,6 +13,12 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+
+  String formatCurrency(double amount) {
+    final format = NumberFormat("#,##0", "vi_VN");
+    return format.format(amount);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,16 +76,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Tổng cộng",
+                      Text("Tổng chi phí",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
                       Text(
-                        totalCost,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                        widget.contract.status == "Active"
+                            ? (widget.contract.totalAllPayments != null
+                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                            : 'Chưa có thông tin thanh toán')
+                            : (widget.contract.totalAmount != null
+                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                            : 'Chưa có thông tin thanh toán'),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -145,13 +160,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   String _formatDate(DateTime date) {
     return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-  }
-
-  String get totalCost {
-    // if (widget.contract.paymentContract != null) {
-    //   return '${widget.contract.paymentContract!.paymentAmount.toStringAsFixed(0)}đ';
-    // }
-    return 'Chưa có thông tin thanh toán';
   }
 
   Widget _buildInfoCard({
