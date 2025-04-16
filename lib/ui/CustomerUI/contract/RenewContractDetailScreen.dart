@@ -14,24 +14,24 @@ class RenewScreen extends StatefulWidget {
 class _RenewScreenState extends State<RenewScreen> {
   final DataService _dataService = DataService();
   int selectedMonthDuration = 1;
-  String totalCost = '0đ';
+  String totalCost = '';
   DateTime selectedStartDate = DateTime.now();
   DateTime endDate = DateTime.now();
+  double _parkingLotPrice = 3000000;
 
   @override
   void initState() {
     super.initState();
     selectedStartDate = widget.contract.endDate;
+    _parkingLotPrice = 3000000;
     _calculateTotalCost();
   }
 
   void _calculateTotalCost() {
-    if (widget.contract.parkingLotPrice != null) {
-      final cost = widget.contract.parkingLotPrice! * selectedMonthDuration;
-      setState(() {
-        totalCost = _formatPrice(cost) + 'đ';
-      });
-    }
+    final cost = _parkingLotPrice * selectedMonthDuration;
+    setState(() {
+      totalCost = _formatPrice(cost) + 'VNĐ';
+    });
     _updateEndDate();
   }
 
