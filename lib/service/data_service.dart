@@ -115,7 +115,7 @@ class DataService {
         final dateParts = car.registedDate.split('/');
         if (dateParts.length == 3) {
           formattedDate =
-          '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
+              '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
         } else {
           formattedDate = DateTime.now().toIso8601String();
         }
@@ -143,15 +143,11 @@ class DataService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Car.fromJson(response.data);
       } else {
-        // Ném lỗi với response để có thể xử lý ở UI
-        throw DioError(
-          requestOptions: response.requestOptions,
-          response: response,
-        );
+        throw Exception(
+            'Failed to add car: ${response.statusCode} - ${response.data}');
       }
     } catch (e) {
-      // Ném lại lỗi để UI có thể bắt và xử lý
-      rethrow;
+      throw Exception('Error adding car: ${e.toString()}');
     }
   }
 
@@ -197,7 +193,7 @@ class DataService {
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer',
-        queryParameters: {'customerId': customerId},
+        queryParameters: {'customerId': customerId}, // Sửa lỗi hardcode 1
         options: Options(headers: {'Accept': 'application/json'}),
       );
 
