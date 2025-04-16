@@ -1,4 +1,5 @@
 import 'package:fe_capstone/models/Contract.dart';
+import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractDetailScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/parking-management/ListParkingScreen.dart';
@@ -51,6 +52,13 @@ class _ContractScreenState extends State<ContractScreen> {
     }
   }
 
+  String getSafeThumbnail(Car car) {
+    if (car.thumbnail == null || car.thumbnail!.isEmpty) {
+      return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s';
+    }
+    return car.thumbnail!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +96,7 @@ class _ContractScreenState extends State<ContractScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTabButton("Chưa thanh toán", 0),
-                _buildTabButton("Đã thanh toán", 1),
+                // _buildTabButton("Đã thanh toán", 1),
                 _buildTabButton("Đang hoạt động", 2),
               ],
             ),
@@ -197,8 +205,38 @@ class _ContractScreenState extends State<ContractScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: const Icon(Icons.directions_car,
-                  size: 40, color: Colors.grey),
+              child: SizedBox( // Thêm SizedBox để cố định kích thước
+                width: 50,
+                height: 50,
+                child: Image.network(
+                  getSafeThumbnail(contract.car),
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.car_repair, size: 24),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

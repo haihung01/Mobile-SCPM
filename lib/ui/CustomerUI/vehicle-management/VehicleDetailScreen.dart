@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/service/data_service.dart';
@@ -123,16 +124,37 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
+                Container(
+                  height: 240, // Tăng chiều cao lên một chút
+                  width: double.infinity, // Chiều rộng full màn hình
+                  margin: EdgeInsets.symmetric(vertical: 16), // Thêm margin
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12), // Bo góc
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s',
-                      height: 200,
+                    child: car.thumbnail?.isNotEmpty == true
+                        ? CachedNetworkImage(
+                      imageUrl: car.thumbnail!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          Icon(Icons.directions_car, size: 100),
-                    ),
+                      width: double.infinity,
+                      height: 180,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => _buildPlaceholderImage(),
+                    )
+                        : _buildPlaceholderImage(),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -252,6 +274,25 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       ),
     );
   }
+}
+
+Widget _buildPlaceholderImage() {
+  return Container(
+    color: Colors.grey[200],
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.car_repair, size: 50, color: Colors.grey[600]),
+          SizedBox(height: 8),
+          Text(
+            'Không có hình ảnh',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 extension CarCopyWith on Car {

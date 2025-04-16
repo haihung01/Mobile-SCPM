@@ -104,7 +104,6 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   }
 
   Widget _buildVehicleCard(BuildContext context, Car vehicle) {
-    // Định nghĩa URL mặc định
     const String defaultImageUrl =
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQraYGSzS_s1fqgQG7xYf1DfmTWfEzHMB44aw&s';
 
@@ -123,7 +122,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 child: Image.network(
                   vehicle.thumbnail?.isNotEmpty == true
                       ? vehicle.thumbnail!
-                      : defaultImageUrl, // Sử dụng thumbnail hoặc default
+                      : defaultImageUrl,
                   height: 115,
                   width: double.infinity,
                   fit: BoxFit.cover,

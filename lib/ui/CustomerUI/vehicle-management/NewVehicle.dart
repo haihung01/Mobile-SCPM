@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -137,7 +138,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
           contracts: [],
           customer: null,
           entrance: null,
-          thumbnail: _thumbnailUrl, // Thêm URL hình ảnh vào thumbnail
+          thumbnail: _thumbnailUrl,
         );
 
         await _dataService.addCar(newCar);
@@ -147,8 +148,23 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
         );
         Navigator.pop(context, true);
       } catch (e) {
+        String errorMessage = 'Thêm xe thất bại';
+
+        // Kiểm tra nếu lỗi là DioError và có response
+        if (e is DioError && e.response != null) {
+          if (e.response!.statusCode == 400) {
+            // Parse thông báo lỗi từ response
+            final responseData = e.response!.data;
+            if (responseData is Map && responseData.containsKey('message')) {
+              errorMessage = responseData['message'];
+            } else {
+              errorMessage = 'Biển số xe đã tồn tại trong hệ thống';
+            }
+          }
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thêm xe thất bại: $e')),
+          SnackBar(content: Text(errorMessage)),
         );
         print("Lỗi khi thêm xe: ${e.toString()}");
       }
@@ -285,48 +301,48 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Expanded(
-                      child: _buildTextField(
-                        "Ngày đăng ký",
-                        _dateController,
-                        hintText: "dd/mm/YYYY",
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(8),
-                          TextInputFormatter.withFunction((oldValue, newValue) {
-                            String formatted = _formatDate(newValue.text);
-                            return TextEditingValue(
-                              text: formatted,
-                              selection: TextSelection.collapsed(offset: formatted.length),
-                            );
-                          }),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập ngày đăng ký';
-                          }
-                          final datePattern = RegExp(r'^\d{2}/\d{2}/\d{4}$');
-                          if (!datePattern.hasMatch(value)) {
-                            return 'Ngày không đúng định dạng (VD: dd/mm/YYYY)';
-                          }
-                          final parts = value.split('/');
-                          final day = int.tryParse(parts[0]) ?? 0;
-                          final month = int.tryParse(parts[1]) ?? 0;
-                          final year = int.tryParse(parts[2]) ?? 0;
-                          if (day < 1 || day > 31) {
-                            return 'Ngày phải từ 01 đến 31';
-                          }
-                          if (month < 1 || month > 12) {
-                            return 'Tháng phải từ 01 đến 12';
-                          }
-                          if (year < 1900 || year > DateTime.now().year) {
-                            return 'Năm không hợp lệ';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 10),
+                    // Expanded(
+                    //   child: _buildTextField(
+                    //     "Ngày đăng ký",
+                    //     _dateController,
+                    //     hintText: "dd/mm/YYYY",
+                    //     inputFormatters: [
+                    //       FilteringTextInputFormatter.digitsOnly,
+                    //       LengthLimitingTextInputFormatter(8),
+                    //       TextInputFormatter.withFunction((oldValue, newValue) {
+                    //         String formatted = _formatDate(newValue.text);
+                    //         return TextEditingValue(
+                    //           text: formatted,
+                    //           selection: TextSelection.collapsed(offset: formatted.length),
+                    //         );
+                    //       }),
+                    //     ],
+                    //     validator: (value) {
+                    //       if (value == null || value.isEmpty) {
+                    //         return 'Vui lòng nhập ngày đăng ký';
+                    //       }
+                    //       final datePattern = RegExp(r'^\d{2}/\d{2}/\d{4}$');
+                    //       if (!datePattern.hasMatch(value)) {
+                    //         return 'Ngày không đúng định dạng (VD: dd/mm/YYYY)';
+                    //       }
+                    //       final parts = value.split('/');
+                    //       final day = int.tryParse(parts[0]) ?? 0;
+                    //       final month = int.tryParse(parts[1]) ?? 0;
+                    //       final year = int.tryParse(parts[2]) ?? 0;
+                    //       if (day < 1 || day > 31) {
+                    //         return 'Ngày phải từ 01 đến 31';
+                    //       }
+                    //       if (month < 1 || month > 12) {
+                    //         return 'Tháng phải từ 01 đến 12';
+                    //       }
+                    //       if (year < 1900 || year > DateTime.now().year) {
+                    //         return 'Năm không hợp lệ';
+                    //       }
+                    //       return null;
+                    //     },
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 10),
                     Expanded(
                       child: _buildTextField(
                         "Màu sắc",
