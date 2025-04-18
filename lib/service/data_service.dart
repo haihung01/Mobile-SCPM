@@ -631,4 +631,24 @@ class DataService {
       throw Exception('Error uploading image: $e');
     }
   }
+
+  // Thêm vào class DataService
+  Future<double> getParkingLotPrice(int parkingLotId) async {
+    try {
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/ParkingLot/GetById',
+        queryParameters: {'id': parkingLotId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        return (response.data['pricePerMonth'] as num).toDouble();
+      } else {
+        throw Exception('Failed to load parking lot price');
+      }
+    } catch (e) {
+      throw Exception('Error fetching parking lot price: ${e.toString()}');
+    }
+  }
+
 }

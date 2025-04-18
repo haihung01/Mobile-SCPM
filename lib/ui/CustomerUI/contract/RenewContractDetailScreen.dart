@@ -18,13 +18,33 @@ class _RenewScreenState extends State<RenewScreen> {
   DateTime selectedStartDate = DateTime.now();
   DateTime endDate = DateTime.now();
   double _parkingLotPrice = 3000000;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     selectedStartDate = widget.contract.endDate;
-    _parkingLotPrice = 3000000;
-    _calculateTotalCost();
+    _fetchParkingLotPrice();
+  }
+
+  Future<void> _fetchParkingLotPrice() async {
+    try {
+      final response = await _dataService.getParkingLotPrice(widget.contract.parkingLotId);
+      setState(() {
+        _parkingLotPrice = response;
+        _calculateTotalCost();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _parkingLotPrice = 3000000; // Fallback value
+        _calculateTotalCost();
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Không thể lấy giá bãi xe, sử dụng giá mặc định")),
+      );
+    }
   }
 
   void _calculateTotalCost() {
@@ -111,6 +131,23 @@ class _RenewScreenState extends State<RenewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.green,
+          elevation: 0,
+          title: Text("Gia hạn hợp đồng", style: TextStyle(color: Colors.white)),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -190,7 +227,6 @@ class _RenewScreenState extends State<RenewScreen> {
                 ],
               ),
             ),
-            // const Spacer(),
             SizedBox(height: 80),
             SizedBox(
               width: double.infinity,
