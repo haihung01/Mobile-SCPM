@@ -109,11 +109,44 @@ class _HomeScreenState extends State<HomeScreen1> {
           ),
         ),
         centerTitle: true,
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(Icons.notifications_none,
-                color: Color.fromARGB(255, 235, 110, 101)),
+            padding: const EdgeInsets.only(right: 20, top: 10),
+            child: Stack(
+              children: [
+                const Icon(
+                  Icons.notifications_none,
+                  color: Color.fromARGB(255, 235, 110, 101),
+                  size: 35,
+                ),
+                Positioned(
+                  right: 0,
+                  top: 5,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '2',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

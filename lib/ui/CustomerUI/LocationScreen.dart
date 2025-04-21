@@ -375,7 +375,7 @@ class _ContractScreenState extends State<LocationScreen> {
       body: Stack(
         children: [
           Positioned(
-            top: 180 * fem,
+            top: 120 * fem,
             left: 0,
             right: 0,
             bottom: 0,
@@ -427,9 +427,9 @@ class _ContractScreenState extends State<LocationScreen> {
             right: 0,
             child: Container(
               padding:
-                  EdgeInsets.fromLTRB(14 * fem, 62 * fem, 14 * fem, 26 * fem),
+                  EdgeInsets.fromLTRB(14 * fem, 52 * fem, 14 * fem, 10 * fem),
               width: double.infinity,
-              height: 200 * fem,
+              height: 120 * fem,
               decoration: BoxDecoration(
                 color: Colors.green.shade600,
                 borderRadius: BorderRadius.only(
@@ -453,7 +453,7 @@ class _ContractScreenState extends State<LocationScreen> {
                       IconButton(
                         icon: Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () {
-                          Navigator.pop(context); // Quay lại trang trước
+                          Navigator.pop(context);
                         },
                       ),
                       SizedBox(width: 8 * fem),
@@ -473,68 +473,67 @@ class _ContractScreenState extends State<LocationScreen> {
                             ),
                           ],
                         ),
+                        // Transform.translate(
+                        //   offset: Offset(0, 1 * fem),
+                        //   child: Container(
+                        //     padding: EdgeInsets.fromLTRB(19 * fem, 0, 14 * fem, 0),
+                        //     decoration: BoxDecoration(
+                        //       color: Color(0xffffffff),
+                        //       borderRadius: BorderRadius.circular(9 * fem),
+                        //     ),
+                        //     child: Row(
+                        //       crossAxisAlignment: CrossAxisAlignment.center,
+                        //       children: [
+                        //         Container(
+                        //           height: 46 * fem,
+                        //           width: 280 * fem,
+                        //           child: TextFormField(
+                        //             controller: _searchController,
+                        //             focusNode: _searchFocusNode,
+                        //             maxLines: 1,
+                        //             decoration: InputDecoration(
+                        //               hintText: 'Bạn muốn đi đến đâu?',
+                        //               border: InputBorder.none,
+                        //             ),
+                        //             onChanged: (value) async {
+                        //               if (!canPerformSearch) return;
+                        //               performAutoSearch(value);
+                        //               setState(() {
+                        //                 showSearchResults = true;
+                        //               });
+                        //             },
+                        //           ),
+                        //         ),
+                        //         Container(
+                        //           margin: EdgeInsets.fromLTRB(0, 0, 9 * fem, 0),
+                        //           width: 1 * fem,
+                        //           height: 46 * fem,
+                        //           decoration: BoxDecoration(
+                        //             color: Color(0x7f000000),
+                        //           ),
+                        //         ),
+                        //         InkWell(
+                        //           onTap: () {
+                        //             // FocusScope.of(context).unfocus(); // Ẩn bàn phím
+                        //             // Navigator.push(
+                        //             //   context,
+                        //             //   MaterialPageRoute(
+                        //             //     builder: (context) => ListParkingScreen(),
+                        //             //   ),
+                        //             // );
+                        //           },
+                        //           child: Container(
+                        //             width: 16 * fem,
+                        //             height: 16 * fem,
+                        //             child: Icon(Icons.search),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                       ),
                     ],
-                  ),
-                  SizedBox(height: 16 * fem),
-                  Transform.translate(
-                    offset: Offset(0, 1 * fem),
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(19 * fem, 0, 14 * fem, 0),
-                      decoration: BoxDecoration(
-                        color: Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(9 * fem),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 46 * fem,
-                            width: 280 * fem,
-                            child: TextFormField(
-                              controller: _searchController,
-                              focusNode: _searchFocusNode,
-                              maxLines: 1,
-                              decoration: InputDecoration(
-                                hintText: 'Bạn muốn đi đến đâu?',
-                                border: InputBorder.none,
-                              ),
-                              onChanged: (value) async {
-                                if (!canPerformSearch) return;
-                                performAutoSearch(value);
-                                setState(() {
-                                  showSearchResults = true;
-                                });
-                              },
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 9 * fem, 0),
-                            width: 1 * fem,
-                            height: 46 * fem,
-                            decoration: BoxDecoration(
-                              color: Color(0x7f000000),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // FocusScope.of(context).unfocus(); // Ẩn bàn phím
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => ListParkingScreen(),
-                              //   ),
-                              // );
-                            },
-                            child: Container(
-                              width: 16 * fem,
-                              height: 16 * fem,
-                              child: Icon(Icons.search),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ],
               ),

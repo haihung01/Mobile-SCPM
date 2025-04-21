@@ -29,7 +29,8 @@ class _RenewScreenState extends State<RenewScreen> {
 
   Future<void> _fetchParkingLotPrice() async {
     try {
-      final response = await _dataService.getParkingLotPrice(widget.contract.parkingLotId);
+      final response =
+          await _dataService.getParkingLotPrice(widget.contract.parkingLotId);
       setState(() {
         _parkingLotPrice = response;
         _calculateTotalCost();
@@ -42,7 +43,8 @@ class _RenewScreenState extends State<RenewScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Không thể lấy giá bãi xe, sử dụng giá mặc định")),
+        SnackBar(
+            content: Text("Không thể lấy giá bãi xe, sử dụng giá mặc định")),
       );
     }
   }
@@ -137,7 +139,8 @@ class _RenewScreenState extends State<RenewScreen> {
         appBar: AppBar(
           backgroundColor: Colors.green,
           elevation: 0,
-          title: Text("Gia hạn hợp đồng", style: TextStyle(color: Colors.white)),
+          title:
+              Text("Gia hạn hợp đồng", style: TextStyle(color: Colors.white)),
           centerTitle: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
