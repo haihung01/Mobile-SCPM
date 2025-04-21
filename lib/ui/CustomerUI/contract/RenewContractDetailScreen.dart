@@ -37,7 +37,7 @@ class _RenewScreenState extends State<RenewScreen> {
       });
     } catch (e) {
       setState(() {
-        _parkingLotPrice = 3000000; // Fallback value
+        _parkingLotPrice = 0;
         _calculateTotalCost();
         _isLoading = false;
       });

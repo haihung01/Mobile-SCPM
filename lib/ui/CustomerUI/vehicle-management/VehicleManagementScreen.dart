@@ -37,10 +37,9 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Lỗi tải danh sách xe'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Không có xe nào'));
           }
-          return _buildVehicleGrid(snapshot.data!);
+          // Luôn gọi _buildVehicleGrid, ngay cả khi snapshot.data rỗng
+          return _buildVehicleGrid(snapshot.data ?? []);
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -50,7 +49,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar:
-          CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
+      CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
     );
   }
 
@@ -85,20 +84,38 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   Widget _buildVehicleGrid(List<Car> vehicles) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.82,
-        ),
-        itemCount: vehicles.length + 1,
-        itemBuilder: (context, index) {
-          if (index < vehicles.length) {
-            return _buildVehicleCard(context, vehicles[index]);
-          }
-          return _buildAddCard(context);
-        },
+      child: Column(
+        children: [
+          if (vehicles.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Text(
+                'Không có xe nào. Nhấn "Thêm xe" để thêm!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.82,
+              ),
+              itemCount: vehicles.length + 1,
+              itemBuilder: (context, index) {
+                if (index < vehicles.length) {
+                  return _buildVehicleCard(context, vehicles[index]);
+                }
+                return _buildAddCard(context);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -153,6 +170,16 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              if (vehicle.entrance != null) ...[
+                Text(
+                  'Vị trí đỗ xe',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text('Tầng: ${vehicle.entrance!.floorName}'),
+                Text('Khu vực: ${vehicle.entrance!.areaName}', ),
+                Text('Bãi đỗ: ${vehicle.entrance!.parkingLotName}', ),
+                Text('Vị trí đỗ: ${vehicle.entrance!.parkingSpaceName}', ),
+              ]
             ],
           ),
         ),
