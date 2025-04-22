@@ -2,6 +2,7 @@ import 'package:fe_capstone/models/Contract.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/contract/ContractDetailScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:fe_capstone/ui/CustomerUI/parking-management/ListParkingScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/payment/PaymentScreen.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
@@ -75,17 +76,22 @@ class _ContractScreenState extends State<ContractScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen1()),
+            );
+          },
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundImage: AssetImage("assets/images/profile1.webp"),
-            ),
-          ),
-        ],
+        // actions: const [
+        //   Padding(
+        //     padding: EdgeInsets.only(right: 16),
+        //     child: CircleAvatar(
+        //       backgroundImage: AssetImage("assets/images/profile1.webp"),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -205,7 +211,8 @@ class _ContractScreenState extends State<ContractScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: SizedBox( // Thêm SizedBox để cố định kích thước
+              child: SizedBox(
+                // Thêm SizedBox để cố định kích thước
                 width: 50,
                 height: 50,
                 child: Image.network(
@@ -220,7 +227,8 @@ class _ContractScreenState extends State<ContractScreen> {
                       child: Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
                               : null,
                         ),
                       ),

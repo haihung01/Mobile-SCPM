@@ -1,17 +1,46 @@
 import 'package:fe_capstone/ui/CustomerUI/feedback/FeedbackDetail.dart';
 import 'package:fe_capstone/ui/CustomerUI/feedback/NewFeedBack.dart';
+import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 
 class FeedbackScreen extends StatelessWidget {
   final List<Map<String, String>> feedbackList = [
     {
-      "title": "hợp đồng xe A",
+      "title": "Hợp đồng xe Ford Ranger",
       "content":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo cons"
+          "Hợp đồng rõ ràng, thời hạn thuê hợp lý. Tôi hài lòng với chiếc BMW 320i – xe chạy êm, ngoại hình sang trọng!Nhân viên hỗ trợ tận tình khi ký hợp đồng. Thời gian xử lý nhanh chóng, xe giao đúng thời điểm."
     },
-    {"title": "test1", "content": "Nội dung feedback2"},
-    {"title": "test2", "content": "Nội dung feedback3"},
+    {
+      "title": "Hợp đồng xe Honda",
+      "content":
+          "Mọi điều khoản được giải thích rõ ràng. Tuy nhiên, nên cập nhật ứng dụng để nhắc thanh toán hợp đồng sớm hơn."
+    },
+    {
+      "title": "Hợp đồng xe VinFast VF8",
+      "content":
+          "Chiếc VinFast VF8 trong hợp đồng rất mới, nội thất sạch sẽ. Tôi đã thuê 2 lần và đều hài lòng."
+    },
+    {
+      "title": "Hợp đồng xe Ford Ranger",
+      "content":
+          "Hợp đồng rõ ràng, thời hạn thuê hợp lý. Tôi hài lòng với chiếc BMW 320i – xe chạy êm, ngoại hình sang trọng!Nhân viên hỗ trợ tận tình khi ký hợp đồng. Thời gian xử lý nhanh chóng, xe giao đúng thời điểm."
+    },
+    {
+      "title": "Hợp đồng xe Honda",
+      "content":
+          "Mọi điều khoản được giải thích rõ ràng. Tuy nhiên, nên cập nhật ứng dụng để nhắc thanh toán hợp đồng sớm hơn."
+    },
+    {
+      "title": "Hợp đồng xe VinFast VF8",
+      "content":
+          "Chiếc VinFast VF8 trong hợp đồng rất mới, nội thất sạch sẽ. Tôi đã thuê 2 lần và đều hài lòng."
+    },
+    {
+      "title": "Hợp đồng xe Ford Ranger",
+      "content":
+          "Hợp đồng rõ ràng, thời hạn thuê hợp lý. Tôi hài lòng với chiếc BMW 320i – xe chạy êm, ngoại hình sang trọng!Nhân viên hỗ trợ tận tình khi ký hợp đồng. Thời gian xử lý nhanh chóng, xe giao đúng thời điểm."
+    },
   ];
 
   @override
@@ -30,17 +59,22 @@ class FeedbackScreen extends StatelessWidget {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen1()),
+            );
+          },
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundImage: AssetImage("assets/images/profile1.webp"),
-            ),
-          ),
-        ],
+        // actions: const [
+        //   Padding(
+        //     padding: EdgeInsets.only(right: 16),
+        //     child: CircleAvatar(
+        //       backgroundImage: AssetImage("assets/images/profile1.webp"),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

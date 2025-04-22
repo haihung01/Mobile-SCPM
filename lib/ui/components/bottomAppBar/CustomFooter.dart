@@ -21,7 +21,8 @@ class CustomFooter extends StatelessWidget {
     return prefs.getBool('isLoggedIn') ?? false;
   }
 
-  Future<void> _handleProtectedNavigation(BuildContext context, Widget screen) async {
+  Future<void> _handleProtectedNavigation(
+      BuildContext context, Widget screen) async {
     final isLoggedIn = await _checkLoginStatus();
 
     if (!isLoggedIn) {
@@ -61,7 +62,7 @@ class CustomFooter extends StatelessWidget {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => HomeScreen1()),
-                (route) => false,
+            (route) => false,
           );
         } else if (index == 1) {
           _handleProtectedNavigation(context, ContractScreen());
@@ -102,7 +103,7 @@ class CustomFooter extends StatelessWidget {
             _buildNavItem(Icons.layers, "Hợp đồng", 1, context),
             const SizedBox(width: 40),
             _buildNavItem(Icons.car_crash, "Quản lý xe", 2, context),
-            _buildNavItem(Icons.feedback_sharp, "Feedback", 3, context),
+            _buildNavItem(Icons.feedback_sharp, "Phản hồi", 3, context),
           ],
         ),
       ),

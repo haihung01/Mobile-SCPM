@@ -80,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 15 * fem),
-                            padding: EdgeInsets.symmetric(horizontal: 10* fem),
+                            padding: EdgeInsets.symmetric(horizontal: 10 * fem),
                             height: 30 * fem,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -105,7 +105,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           Container(
                               margin: EdgeInsets.symmetric(vertical: 15 * fem),
-                              padding: EdgeInsets.symmetric(horizontal: 10* fem),
+                              padding:
+                                  EdgeInsets.symmetric(horizontal: 10 * fem),
                               height: 20 * fem,
                               child: Row(
                                 children: [
@@ -131,21 +132,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 ],
-                              )
-                          ),
+                              )),
                           Align(
                             child: SizedBox(
                               width: 390 * fem,
                               height: 1.01 * fem,
                               child: Divider(
                                 thickness: 1,
-                                color: Colors.grey[300], // Đặt màu của Divider thành trong suốt
+                                color: Colors.grey[
+                                    300], // Đặt màu của Divider thành trong suốt
                               ),
                             ),
                           ),
                           Container(
                               margin: EdgeInsets.symmetric(vertical: 15 * fem),
-                              padding: EdgeInsets.symmetric(horizontal: 10* fem),
+                              padding:
+                                  EdgeInsets.symmetric(horizontal: 10 * fem),
                               height: 20 * fem,
                               child: Row(
                                 children: [
@@ -171,21 +173,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 ],
-                              )
-                          ),
+                              )),
                           Align(
                             child: SizedBox(
                               width: 390 * fem,
                               height: 1.01 * fem,
                               child: Divider(
                                 thickness: 1,
-                                color: Colors.grey[300], // Đặt màu của Divider thành trong suốt
+                                color: Colors.grey[
+                                    300], // Đặt màu của Divider thành trong suốt
                               ),
                             ),
                           ),
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 15 * fem),
-                            padding: EdgeInsets.symmetric(horizontal: 10* fem),
+                            padding: EdgeInsets.symmetric(horizontal: 10 * fem),
                             height: 20 * fem,
                             child: Row(
                               children: [
@@ -225,7 +227,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => EditProfileScreen(), // Thay thế EditPloProfileScreen bằng màn hình chỉnh sửa của bạn
+                            builder: (context) =>
+                                EditProfileScreen(), // Thay thế EditPloProfileScreen bằng màn hình chỉnh sửa của bạn
                           ),
                         );
                       },
@@ -261,19 +264,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Expanded(
               child: Container(
-                padding:
-                EdgeInsets.fromLTRB(14 * fem, 0, 14 * fem, 0),
+                padding: EdgeInsets.fromLTRB(14 * fem, 0, 14 * fem, 0),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChangePasswordScreen()));
                       },
                       child: Container(
-                        margin:
-                        EdgeInsets.fromLTRB(1 * fem, 0 * fem, 0 * fem, 0 * fem),
+                        margin: EdgeInsets.fromLTRB(
+                            1 * fem, 0 * fem, 0 * fem, 0 * fem),
                         width: 362 * fem,
                         height: 63 * fem,
                         decoration: BoxDecoration(
@@ -300,7 +305,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                       ),
@@ -309,12 +313,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 14 * fem,
                     ),
                     InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => VehicleScreen()));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => VehicleScreen()));
                       },
                       child: Container(
-                        margin:
-                        EdgeInsets.fromLTRB(1 * fem, 0 * fem, 0 * fem, 0 * fem),
+                        margin: EdgeInsets.fromLTRB(
+                            1 * fem, 0 * fem, 0 * fem, 0 * fem),
                         width: 362 * fem,
                         height: 63 * fem,
                         decoration: BoxDecoration(
@@ -341,22 +348,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                       ),
                     ),
-
                     SizedBox(
                       height: 14 * fem,
                     ),
                     InkWell(
-                      onTap: (){
-                        PersistentNavBarNavigator.pushNewScreen( context, screen: LoginScreen(), withNavBar: false, pageTransitionAnimation: PageTransitionAnimation.cupertino, );
+                      onTap: () {
+                        PersistentNavBarNavigator.pushNewScreen(
+                          context,
+                          screen: LoginScreen(),
+                          withNavBar: false,
+                          pageTransitionAnimation:
+                              PageTransitionAnimation.cupertino,
+                        );
                       },
                       child: Container(
-                        margin:
-                        EdgeInsets.fromLTRB(1 * fem, 0 * fem, 0 * fem, 0 * fem),
+                        margin: EdgeInsets.fromLTRB(
+                            1 * fem, 0 * fem, 0 * fem, 0 * fem),
                         width: 362 * fem,
                         height: 63 * fem,
                         decoration: BoxDecoration(
@@ -383,12 +394,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
