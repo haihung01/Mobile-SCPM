@@ -112,40 +112,111 @@ class _HomeScreenState extends State<HomeScreen1> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20, top: 10),
-            child: Stack(
-              children: [
-                const Icon(
-                  Icons.notifications_none,
-                  color: Color.fromARGB(255, 235, 110, 101),
-                  size: 35,
-                ),
-                Positioned(
-                  right: 0,
-                  top: 5,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '2',
+            child: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text(
+                        'Thông báo',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            color: Colors.red,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900),
                         textAlign: TextAlign.center,
+                      ),
+                      content: SizedBox(
+                        width: double.maxFinite,
+                        height: 400, // Chiều cao tối đa popup, có thể tùy chỉnh
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe BMW 320i',
+                                paymentTime: '20/04/2025',
+                                isPaid: true,
+                              ),
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe Mercedes GLC',
+                                paymentTime: '18/04/2025',
+                                isPaid: false,
+                              ),
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe VinFast VF8',
+                                paymentTime: '15/04/2025',
+                                isPaid: true,
+                              ),
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe Toyota Vios',
+                                paymentTime: '10/04/2025',
+                                isPaid: false,
+                              ),
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe VinFast VF8',
+                                paymentTime: '15/04/2025',
+                                isPaid: true,
+                              ),
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe BMW 320i',
+                                paymentTime: '20/04/2025',
+                                isPaid: true,
+                              ),
+                              _buildNotificationCard(
+                                contractName: 'Hợp Đồng Xe Mercedes GLC',
+                                paymentTime: '18/04/2025',
+                                isPaid: false,
+                              ),
+                              // Có thể thêm bao nhiêu cũng được ở đây
+                            ],
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Đóng'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Stack(
+                children: [
+                  const Icon(
+                    Icons.notifications_none,
+                    color: Color.fromARGB(255, 235, 110, 101),
+                    size: 35,
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 5,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '2',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -333,4 +404,57 @@ class _HomeScreenState extends State<HomeScreen1> {
       ),
     );
   }
+}
+
+Widget _buildNotificationCard({
+  required String contractName,
+  required String paymentTime,
+  required bool isPaid,
+}) {
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.grey.shade300),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 6,
+          offset: Offset(0, 2),
+        )
+      ],
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.directions_car, size: 40, color: Colors.blue),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                contractName,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 4),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: isPaid ? Colors.green : Colors.red,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            isPaid ? 'Đã duyệt' : 'Từ chối',
+            style: TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ),
+      ],
+    ),
+  );
 }

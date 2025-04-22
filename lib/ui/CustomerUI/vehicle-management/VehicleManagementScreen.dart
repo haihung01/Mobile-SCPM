@@ -1,4 +1,5 @@
 import 'package:fe_capstone/models/car_model.dart';
+import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/NewVehicle.dart';
@@ -49,7 +50,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar:
-      CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
+          CustomFooter(selectedIndex: 2, onItemTapped: (index) {}),
     );
   }
 
@@ -67,17 +68,22 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       ),
       centerTitle: true,
       leading: IconButton(
-        icon: const Icon(Icons.menu, color: Colors.black),
-        onPressed: () {},
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen1()),
+          );
+        },
       ),
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: 16),
-          child: CircleAvatar(
-            backgroundImage: AssetImage("assets/images/profile1.webp"),
-          ),
-        ),
-      ],
+      // actions: const [
+      //   Padding(
+      //     padding: EdgeInsets.only(right: 16),
+      //     child: CircleAvatar(
+      //       backgroundImage: AssetImage("assets/images/profile1.webp"),
+      //     ),
+      //   ),
+      // ],
     );
   }
 
@@ -154,7 +160,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
               Text(
                 vehicle.model,
                 style:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -176,9 +182,15 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text('Tầng: ${vehicle.entrance!.floorName}'),
-                Text('Khu vực: ${vehicle.entrance!.areaName}', ),
-                Text('Bãi đỗ: ${vehicle.entrance!.parkingLotName}', ),
-                Text('Vị trí đỗ: ${vehicle.entrance!.parkingSpaceName}', ),
+                Text(
+                  'Khu vực: ${vehicle.entrance!.areaName}',
+                ),
+                Text(
+                  'Bãi đỗ: ${vehicle.entrance!.parkingLotName}',
+                ),
+                Text(
+                  'Vị trí đỗ: ${vehicle.entrance!.parkingSpaceName}',
+                ),
               ]
             ],
           ),
