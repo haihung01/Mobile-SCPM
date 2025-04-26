@@ -132,47 +132,49 @@ class _ContractScreenState extends State<LocationScreen> {
 
   Marker _buildParkingMarker(ParkingLot parking) {
     return Marker(
-      alignment: Alignment.bottomCenter,
-      width: 80,
-      height: 80,
+      alignment: Alignment.center,
+      width: 60,
+      height: 60,
       child: GestureDetector(
         onTap: () {
           _showParkingInfoDialog(parking);
         },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Container(
-              width: 50,
-              height: 50,
+            Positioned(
+              bottom: 0,
               child: Icon(
                 Icons.local_parking_outlined,
                 color: Colors.green,
                 size: 40,
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  )
-                ],
-              ),
-              child: Text(
-                parking.address,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+            Positioned(
+              top: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    )
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Text(
+                  parking.address,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],
@@ -185,35 +187,6 @@ class _ContractScreenState extends State<LocationScreen> {
     );
   }
 
-  // void _showParkingInfoDialog(ParkingLot parking) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(parking.address),
-  //       content: SingleChildScrollView(
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             _buildInfoRow(Icons.location_on, parking.address),
-  //             _buildInfoRow(Icons.attach_money,
-  //                 'Giá theo giờ; ${parking.pricePerHour} VND'),
-  //             _buildInfoRow(Icons.attach_money,
-  //                 'Giá theo ngày: ${parking.pricePerDay} VND'),
-  //             _buildInfoRow(Icons.attach_money,
-  //                 'Giá theo tháng: ${parking.pricePerMonth} VND'),
-  //           ],
-  //         ),
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: Text('Đóng'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
   void _showParkingInfoDialog(ParkingLot parking) {
     showModalBottomSheet(
       context: context,
@@ -268,7 +241,7 @@ class _ContractScreenState extends State<LocationScreen> {
                 height: 38,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context); // đóng BottomSheet trước
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade600,
@@ -288,18 +261,6 @@ class _ContractScreenState extends State<LocationScreen> {
     );
   }
 
-  // Widget _buildInfoRow(IconData icon, String text) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 4.0),
-  //     child: Row(
-  //       children: [
-  //         Icon(icon, size: 16, color: Colors.blue),
-  //         SizedBox(width: 8),
-  //         Expanded(child: Text(text)),
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget _infoRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -384,7 +345,7 @@ class _ContractScreenState extends State<LocationScreen> {
               child: VietmapGL(
                 myLocationEnabled: true,
                 styleString:
-                    '${BaseConstants.VIETMAP_URL}/maps/light/styles.json?apikey=${BaseConstants.VIET_MAP_APIKEY}',
+                '${BaseConstants.VIETMAP_URL}/maps/light/styles.json?apikey=${BaseConstants.VIET_MAP_APIKEY}',
                 trackCameraPosition: true,
                 onMapCreated: _onMapCreated,
                 compassEnabled: false,
@@ -404,7 +365,7 @@ class _ContractScreenState extends State<LocationScreen> {
                     target: LatLng(10.739031, 106.680524), zoom: 14),
                 onMapClick: (point, coordinates) async {
                   var data =
-                      await _mapController?.queryRenderedFeatures(point: point);
+                  await _mapController?.queryRenderedFeatures(point: point);
                 },
               ),
             ),
@@ -427,7 +388,7 @@ class _ContractScreenState extends State<LocationScreen> {
             right: 0,
             child: Container(
               padding:
-                  EdgeInsets.fromLTRB(14 * fem, 52 * fem, 14 * fem, 10 * fem),
+              EdgeInsets.fromLTRB(14 * fem, 52 * fem, 14 * fem, 10 * fem),
               width: double.infinity,
               height: 120 * fem,
               decoration: BoxDecoration(
@@ -473,65 +434,6 @@ class _ContractScreenState extends State<LocationScreen> {
                             ),
                           ],
                         ),
-                        // Transform.translate(
-                        //   offset: Offset(0, 1 * fem),
-                        //   child: Container(
-                        //     padding: EdgeInsets.fromLTRB(19 * fem, 0, 14 * fem, 0),
-                        //     decoration: BoxDecoration(
-                        //       color: Color(0xffffffff),
-                        //       borderRadius: BorderRadius.circular(9 * fem),
-                        //     ),
-                        //     child: Row(
-                        //       crossAxisAlignment: CrossAxisAlignment.center,
-                        //       children: [
-                        //         Container(
-                        //           height: 46 * fem,
-                        //           width: 280 * fem,
-                        //           child: TextFormField(
-                        //             controller: _searchController,
-                        //             focusNode: _searchFocusNode,
-                        //             maxLines: 1,
-                        //             decoration: InputDecoration(
-                        //               hintText: 'Bạn muốn đi đến đâu?',
-                        //               border: InputBorder.none,
-                        //             ),
-                        //             onChanged: (value) async {
-                        //               if (!canPerformSearch) return;
-                        //               performAutoSearch(value);
-                        //               setState(() {
-                        //                 showSearchResults = true;
-                        //               });
-                        //             },
-                        //           ),
-                        //         ),
-                        //         Container(
-                        //           margin: EdgeInsets.fromLTRB(0, 0, 9 * fem, 0),
-                        //           width: 1 * fem,
-                        //           height: 46 * fem,
-                        //           decoration: BoxDecoration(
-                        //             color: Color(0x7f000000),
-                        //           ),
-                        //         ),
-                        //         InkWell(
-                        //           onTap: () {
-                        //             // FocusScope.of(context).unfocus(); // Ẩn bàn phím
-                        //             // Navigator.push(
-                        //             //   context,
-                        //             //   MaterialPageRoute(
-                        //             //     builder: (context) => ListParkingScreen(),
-                        //             //   ),
-                        //             // );
-                        //           },
-                        //           child: Container(
-                        //             width: 16 * fem,
-                        //             height: 16 * fem,
-                        //             child: Icon(Icons.search),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
                       ),
                     ],
                   ),
@@ -545,45 +447,45 @@ class _ContractScreenState extends State<LocationScreen> {
             right: 0,
             child: showSearchResults
                 ? Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16 * fem),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        minHeight: 50 * fem,
-                        maxHeight: 220 * fem,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12 * fem),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        itemCount: autoSearchResults.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(autoSearchResults[index]['name']),
-                            subtitle: Text(autoSearchResults[index]['address']),
-                            onTap: () {
-                              var selectedResult =
-                                  autoSearchResults[index]['ref_id'];
-                              getLatAndLong(selectedResult);
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              setState(() {
-                                showSearchResults = false;
-                              });
-                            },
-                          );
-                        },
-                      ),
+              padding: EdgeInsets.symmetric(horizontal: 16 * fem),
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: 50 * fem,
+                  maxHeight: 220 * fem,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12 * fem),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
                     ),
-                  )
+                  ],
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: autoSearchResults.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(autoSearchResults[index]['name']),
+                      subtitle: Text(autoSearchResults[index]['address']),
+                      onTap: () {
+                        var selectedResult =
+                        autoSearchResults[index]['ref_id'];
+                        getLatAndLong(selectedResult);
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        setState(() {
+                          showSearchResults = false;
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+            )
                 : SizedBox.shrink(),
           ),
         ],
