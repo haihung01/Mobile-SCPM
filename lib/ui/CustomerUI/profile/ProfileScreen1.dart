@@ -34,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen1()),
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.notifications_none, color: Colors.black),
+                  const Icon(Icons.chevron_right, color: Colors.black),
                 ],
               ),
             ),
@@ -145,14 +145,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.green,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
       bottomNavigationBar: CustomFooter(
         selectedIndex: 0,
         onItemTapped: (index) {},
@@ -168,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       trailing:
-      const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
       onTap: () {},
     );
   }

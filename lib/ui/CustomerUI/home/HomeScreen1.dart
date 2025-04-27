@@ -255,8 +255,8 @@ class _HomeScreenState extends State<HomeScreen1> {
                     iconColor: Color.fromARGB(255, 130, 187, 233),
                   ),
                   _buildCard(
-                    Icons.notifications_active_outlined,
-                    "Thông báo",
+                    Icons.history_toggle_off_sharp,
+                    "Lịch sử",
                     () {},
                     iconColor: const Color.fromARGB(255, 235, 110, 101),
                   ),
