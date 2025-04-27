@@ -13,7 +13,6 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-
   String formatCurrency(double amount) {
     final format = NumberFormat("#,##0", "vi_VN");
     return format.format(amount);
@@ -56,7 +55,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
             _buildInfoCard(
               icon: Icons.directions_car,
               title: "Xe đăng ký",
@@ -82,11 +80,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       Text(
                         widget.contract.status == "Active"
                             ? (widget.contract.totalAllPayments != null
-                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
-                            : 'Chưa có thông tin thanh toán')
+                                ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                                : 'Chưa có thông tin thanh toán')
                             : (widget.contract.totalAmount != null
-                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
-                            : 'Chưa có thông tin thanh toán'),
+                                ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                                : 'Chưa có thông tin thanh toán'),
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -98,7 +96,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
             _buildInfoCard(
               icon: Icons.payment,
               title: "Phương thức thanh toán",
@@ -108,14 +105,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(width: 10),
                   const Text("Thanh toán qua VNPAY",
                       style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   const Spacer(),
-                  const Icon(Icons.chevron_right),
+                  // const Icon(Icons.chevron_right),
                 ],
               ),
             ),
             const Spacer(),
-
             SizedBox(
               width: 250,
               height: 48,
@@ -129,7 +125,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RechargeWebViewScreen(url, contractId),
+                        builder: (context) =>
+                            RechargeWebViewScreen(url, contractId),
                       ),
                     );
                   } else {

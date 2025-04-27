@@ -37,7 +37,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
     return format.format(amount);
   }
 
-
   Future<void> _openMap(double lat, double long) async {
     final String geoUrl = '${UrlConstant.GOOGLE_MAPS_GEO}$lat,$long';
     final String googleMapsAppUrl = '${UrlConstant.GOOGLE_MAPS_APP}$lat,$long';
@@ -208,11 +207,11 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                       Text(
                         widget.contract.status == "Active"
                             ? (widget.contract.totalAllPayments != null
-                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
-                            : 'Chưa có thông tin thanh toán')
+                                ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                                : 'Chưa có thông tin thanh toán')
                             : (widget.contract.totalAmount != null
-                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
-                            : 'Chưa có thông tin thanh toán'),
+                                ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                                : 'Chưa có thông tin thanh toán'),
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -320,7 +319,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               children: [
                 Text(title,
                     style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
                 Row(
                   children: [
