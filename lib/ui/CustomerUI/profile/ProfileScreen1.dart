@@ -1,4 +1,6 @@
+import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
+import 'package:fe_capstone/ui/CustomerUI/profile/ProfileDetailScreen.dart';
 import 'package:fe_capstone/ui/screens/LoginScreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
@@ -22,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      username = prefs.getString('username') ?? 'tiendat';
+      username = prefs.getString('username') ?? '';
       email = prefs.getString('email') ?? '';
     });
   }
@@ -59,49 +61,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundImage: AssetImage("assets/images/profile1.webp"),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          username,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          email,
-                          style: TextStyle(
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      spreadRadius: 2,
                     ),
+                  ],
+                ),
+                child: GestureDetector(
+                  onTap: () async {
+                    try {
+                      final prefs = await SharedPreferences.getInstance();
+                      final customerId = prefs.getInt('ownerId');
+
+                      if (customerId == null) {
+                        throw Exception('Không tìm thấy ID người dùng');
+                      }
+
+                      final dataService = DataService();
+                      final userData =
+                          await dataService.getCustomerById(customerId);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ProfileDetailScreen(userData: userData),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Lỗi tải thông tin người dùng: $e')),
+                      );
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 30,
+                        backgroundImage:
+                            AssetImage("assets/images/profile1.webp"),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              username,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              email,
+                              style: const TextStyle(
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right, color: Colors.black),
+                    ],
                   ),
-                  const Icon(Icons.chevron_right, color: Colors.black),
-                ],
-              ),
-            ),
+                )),
             const SizedBox(height: 16),
 
             // Menu List
