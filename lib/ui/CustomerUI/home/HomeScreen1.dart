@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:fe_capstone/ui/ChatScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/chat/ChatScreenSCPM.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleManagementScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -128,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen1> {
                       ),
                       content: SizedBox(
                         width: double.maxFinite,
-                        height: 400, // Chiều cao tối đa popup, có thể tùy chỉnh
+                        height: 400,
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
@@ -298,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen1> {
                           itemCount: 3,
                           itemBuilder: (context, index) {
                             final images = [
-                              'https://hungvuongphat.com/wp-content/uploads/2021/07/mo-hinh-bai-giu-xe-thong-minh.jpg',
+                              'https://baigiuxethongminh.vn/wp-content/uploads/2020/03/bai-giu-xe-thong-minh-vietparking.jpg',
                               'https://vending-cdn.kootoro.com/torov-cms/upload/image/1672300550330-d%C3%A1n%20decal%20qu%E1%BA%A3ng%20c%C3%A1o%20%C3%B4%20t%C3%B4.jpg',
                               'https://bcp.cdnchinhphu.vn/334894974524682240/2022/4/1/b60a911bf638239b911a077c0744ec96-16488114501631594628377.jpg',
                             ];
@@ -360,7 +362,12 @@ class _HomeScreenState extends State<HomeScreen1> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChatScreenSCPM()),
+          );
+        },
         backgroundColor: Colors.green,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),

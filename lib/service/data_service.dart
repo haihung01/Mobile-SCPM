@@ -185,6 +185,24 @@ class DataService {
     }
   }
 
+  Future<Map<String, dynamic>> getCustomerById(int id) async {
+    try {
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Customer/GetById',
+        queryParameters: {'id': id},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception('Failed to fetch customer: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching customer: ${e.toString()}');
+    }
+  }
+
   Future<List<Contract>> getCustomerContracts() async {
     try {
       final customerId = await getCustomerId();
@@ -650,5 +668,4 @@ class DataService {
       throw Exception('Error fetching parking lot price: ${e.toString()}');
     }
   }
-
 }
