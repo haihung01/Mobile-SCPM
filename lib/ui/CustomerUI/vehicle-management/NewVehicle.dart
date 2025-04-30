@@ -398,13 +398,13 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                     });
                   },
                 ),
-                const SizedBox(height: 20),
-                _buildTextField(
-                  "Mô tả (nếu có)",
-                  _descriptionController,
-                  maxLines: 3,
-                  hintText: "Xe có bị gì không...",
-                ),
+                // const SizedBox(height: 20),
+                // _buildTextField(
+                //   "Mô tả (nếu có)",
+                //   _descriptionController,
+                //   maxLines: 3,
+                //   hintText: "Xe có bị gì không...",
+                // ),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: 234,

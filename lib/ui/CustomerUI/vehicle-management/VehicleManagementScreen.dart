@@ -176,22 +176,22 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (vehicle.entrance != null) ...[
-                Text(
-                  'Vị trí đỗ xe',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text('Tầng: ${vehicle.entrance!.floorName}'),
-                Text(
-                  'Khu vực: ${vehicle.entrance!.areaName}',
-                ),
-                Text(
-                  'Bãi đỗ: ${vehicle.entrance!.parkingLotName}',
-                ),
-                Text(
-                  'Vị trí đỗ: ${vehicle.entrance!.parkingSpaceName}',
-                ),
-              ]
+              // if (vehicle.entrance != null) ...[
+              //   Text(
+              //     'Vị trí đỗ xe',
+              //     style: TextStyle(fontWeight: FontWeight.bold),
+              //   ),
+              //   Text('Tầng: ${vehicle.entrance!.floorName}'),
+              //   Text(
+              //     'Khu vực: ${vehicle.entrance!.areaName}',
+              //   ),
+              //   Text(
+              //     'Bãi đỗ: ${vehicle.entrance!.parkingLotName}',
+              //   ),
+              //   Text(
+              //     'Vị trí đỗ: ${vehicle.entrance!.parkingSpaceName}',
+              //   ),
+              // ]
             ],
           ),
         ),
