@@ -95,8 +95,27 @@ class _RenewScreenState extends State<RenewScreen> {
         numberMonth: selectedMonthDuration,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gia hạn hợp đồng thành công!")),
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text("Gia hạn hợp đồng thành công!")),
+      // );
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Thành công'),
+          content: Text('Gia hạn hợp đồng thành công!'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
       );
 
       Navigator.pop(context);

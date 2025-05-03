@@ -461,8 +461,30 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
           isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Hợp đồng đã được gửi thành công!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Hợp đồng đã được gửi thành công!")),
+        // );
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Thành công"),
+            content: Text("Hợp đồng đã được gửi thành công!"),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ContractScreen()),
+                  );
+                },
+                child: Text("OK"),
+              ),
+            ],
+          ),
         );
 
         Navigator.push(
