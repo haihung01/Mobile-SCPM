@@ -159,7 +159,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
         Navigator.pop(context, true);
       } catch (e) {
         String errorMessage = 'Vui lòng nhập lại... ';
-
         if (e is DioError && e.response != null) {
           if (e.response!.statusCode == 400) {
             final responseData = e.response!.data;

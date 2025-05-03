@@ -355,6 +355,8 @@ class _ContractScreenState extends State<ContractScreen> {
         return 'Từ chối';
       case 'Paid':
         return 'Đã thanh toán';
+      case 'PendingActivation':
+        return 'Chờ hiệu lực';
       case 'Active':
         return 'Đang hoạt động';
       default:
@@ -372,6 +374,8 @@ class _ContractScreenState extends State<ContractScreen> {
         return Colors.red;
       case 'Paid':
         return Colors.purple;
+      case 'PendingActivation':
+        return Colors.blue;
       case 'Active':
         return Colors.blue;
       default:

@@ -1,7 +1,6 @@
+import 'package:fe_capstone/ui/screens/LoginScreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/service/data_service.dart';
-import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -19,7 +18,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
 
   Future<void> _register() async {
-    // Kiểm tra định dạng email
     final emailPattern = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (_emailController.text.isEmpty || !emailPattern.hasMatch(_emailController.text)) {
       showDialog(
@@ -37,7 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         },
       );
-      return; // Dừng lại nếu email không hợp lệ
+      return;
     }
 
     try {
@@ -50,42 +48,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
       );
 
-      // Auto-login after successful registration
-      try {
-        await _dataService.login(
-          _usernameController.text,
-          _passwordController.text,
-        );
-
-        // Save login state
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-
-        // Navigate to HomeScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen1()),
-        );
-      } catch (e) {
-        final errorMessage = e.toString().replaceFirst('Exception: ', '');
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("Lỗi"),
-              content: Text("Đăng ký thành công nhưng đăng nhập thất bại: $errorMessage"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
-      }
+      // Show success dialog and navigate to login screen
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Thành công"),
+            content: Text("Đăng ký thành công! Vui lòng đăng nhập để tiếp tục."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen1()), // Adjust to your login screen
+                  );
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
-      // Hiển thị trực tiếp message từ server
       final errorMessage = e.toString().replaceFirst('Exception: ', '');
       showDialog(
         context: context,

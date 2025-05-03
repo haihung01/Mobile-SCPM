@@ -31,12 +31,13 @@ class _LoginScreen1State extends State<LoginScreen1> {
         MaterialPageRoute(builder: (context) => HomeScreen1()),
       );
     } catch (e) {
+      final errorMessage = e.toString().replaceFirst('Exception: ', '');
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text("Lỗi"),
-            content: Text("Đăng nhập thất bại. Vui lòng thử lại."),
+            content: Text(errorMessage),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),

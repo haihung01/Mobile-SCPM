@@ -60,16 +60,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   // Hàm xử lý cập nhật xe
   Future<void> _updateCar() async {
     if (_formKey.currentState!.validate()) {
-      // Định dạng lại biển số xe trước khi gửi
       _editableCar = _editableCar.copyWith(
         licensePlate: _formatLicensePlate(_editableCar.licensePlate),
       );
 
       try {
-        // Thực hiện cập nhật bất đồng bộ
         final updatedCar = await _dataService.updateCar(_editableCar);
 
-        // Sau khi cập nhật thành công, gọi setState đồng bộ
         setState(() {
           _isEditing = false;
           _futureCar = Future.value(updatedCar);
