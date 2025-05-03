@@ -36,37 +36,38 @@ class ParkingDetailCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if(!type.contains("Normal"))
-            Container(
-              margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 5 * fem),
-              padding: EdgeInsets.fromLTRB(14 * fem, 14 * fem, 4 * fem, 10 * fem), // Adjusted padding
-              width: 120 * fem,
-              decoration: BoxDecoration(
-                color: Color(0xffdcdada),
-                borderRadius: BorderRadius.circular(6 * fem),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 20 * fem, // Reduced icon size
-                    height: 20 * fem, // Reduced icon size
-                    child: Icon(Icons.message),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(left: 8 * fem),
-                    child: Text(
-                      'Nhắn tin',
-                      style: TextStyle(
-                        fontSize: 18 * ffem,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff000000),
+            if (!type.contains("Normal"))
+              Container(
+                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 5 * fem),
+                padding: EdgeInsets.fromLTRB(
+                    14 * fem, 14 * fem, 4 * fem, 10 * fem), // Adjusted padding
+                width: 120 * fem,
+                decoration: BoxDecoration(
+                  color: Color(0xffdcdada),
+                  borderRadius: BorderRadius.circular(6 * fem),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 20 * fem, // Reduced icon size
+                      height: 20 * fem, // Reduced icon size
+                      child: Icon(Icons.message),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 8 * fem),
+                      child: Text(
+                        'Nhắn tin',
+                        style: TextStyle(
+                          fontSize: 18 * ffem,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff000000),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
             Container(
               margin: EdgeInsets.only(top: 25 * fem),
               padding: EdgeInsets.fromLTRB(8 * fem, 0, 8 * fem, 16 * fem),
@@ -118,7 +119,7 @@ class ParkingDetailCard extends StatelessWidget {
                         ),
                         Spacer(),
                         Container(
-                          width:  60* fem,
+                          width: 60 * fem,
                           height: 20 * fem,
                           decoration: BoxDecoration(
                             color: Color(0xfff5e4e4),

@@ -177,10 +177,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     return Column(
       children: [
         _infoTile('Tên xe', car.model),
+        _infoTile('Thương hiệu', car.brand),
         _infoTile('Biển số', car.licensePlate),
         _infoTile('Màu sắc', car.color),
         // _infoTile('Ngày đăng ký', car.registedDate),
-        _infoTile('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
+        // _infoTile('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
         _infoTile('Mô tả', car.color),
         if (car.entrance != null) ...[
           Padding(
@@ -216,6 +217,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         children: [
           _textField('Tên xe', _editableCar.model,
               (value) => _editableCar = _editableCar.copyWith(model: value)),
+          _textField('Thương hiệu', _editableCar.brand,
+              (value) => _editableCar = _editableCar.copyWith(brand: value)),
 
           // Biển số: chỉ hiển thị, không cho sửa
           Padding(
@@ -235,12 +238,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           _textField('Màu sắc', _editableCar.color,
               (value) => _editableCar = _editableCar.copyWith(color: value)),
 
-          SwitchListTile(
-            title: Text('Trạng thái hoạt động'),
-            value: _editableCar.status,
-            onChanged: (value) => setState(
-                () => _editableCar = _editableCar.copyWith(status: value)),
-          ),
+          // SwitchListTile(
+          //   title: Text('Trạng thái hoạt động'),
+          //   value: _editableCar.status,
+          //   onChanged: (value) => setState(
+          //       () => _editableCar = _editableCar.copyWith(status: value)),
+          // ),
         ],
       ),
     );
@@ -298,6 +301,7 @@ extension CarCopyWith on Car {
     int? customerId,
     String? model,
     String? color,
+    String? brand,
     String? licensePlate,
     String? registedDate,
     bool? status,
@@ -314,6 +318,7 @@ extension CarCopyWith on Car {
       status: status ?? this.status,
       contracts: contracts ?? this.contracts,
       customer: customer ?? this.customer,
+      brand: brand ?? this.brand,
     );
   }
 }

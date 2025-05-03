@@ -12,6 +12,7 @@ class Car {
   final dynamic customer;
   final Entrance? entrance;
   final String? thumbnail;
+  final String brand;
 
   Car({
     required this.carId,
@@ -25,6 +26,7 @@ class Car {
     required this.customer,
     this.entrance,
     this.thumbnail,
+    required this.brand,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class Car {
           ? Entrance.fromJson(json['entrance'] as Map<String, dynamic>)
           : null,
       thumbnail: json['thumbnail'] as String?,
+      brand: json['brand'] as String? ?? '',
     );
   }
 
@@ -58,6 +61,7 @@ class Car {
       'customer': customer,
       'entrance': entrance?.toJson(),
       'thumbnail': thumbnail,
+      "brand": brand,
     };
   }
 
@@ -73,6 +77,7 @@ class Car {
     dynamic customer,
     Entrance? entrance,
     String? thumbnail,
+    String? brand,
   }) {
     return Car(
       carId: carId ?? this.carId,
@@ -86,6 +91,7 @@ class Car {
       customer: customer ?? this.customer,
       entrance: entrance ?? this.entrance,
       thumbnail: thumbnail ?? this.thumbnail,
+      brand: brand ?? this.brand,
     );
   }
 }

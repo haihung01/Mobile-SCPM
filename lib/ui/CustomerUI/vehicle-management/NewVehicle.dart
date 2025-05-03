@@ -26,6 +26,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _brandTextController = TextEditingController();
 
   String _selectedBrand = "BMW";
   bool _status = true;
@@ -149,14 +150,27 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
           customer: null,
           entrance: null,
           thumbnail: _thumbnailUrl,
+          brand: _brandTextController.text,
         );
 
         await _dataService.addCar(newCar);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Thêm xe thành công!')),
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Thêm xe thành công!'),
+            content: const Text('Xe của bạn đã được thêm vào hệ thống.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context, true);
+                },
+                child: const Text('Đóng'),
+              ),
+            ],
+          ),
         );
-        Navigator.pop(context, true);
       } catch (e) {
         String errorMessage = 'Vui lòng nhập lại... ';
         if (e is DioError && e.response != null) {
@@ -218,9 +232,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
               children: [
                 // Image Picker
                 GestureDetector(
-                  onTap: _isUploading
-                      ? null
-                      : _pickImage, // Vô hiệu hóa khi đang upload
+                  onTap: _isUploading ? null : _pickImage,
                   child: Container(
                     height: 200,
                     width: 214,
@@ -279,15 +291,29 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                 ),
                 const SizedBox(height: 30),
                 _buildTextField(
-                  "Hãng xe",
+                  "Tên xe",
                   _brandController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập hãng xe';
+                      return 'Vui lòng nhập tên xe';
                     }
                     return null;
                   },
                 ),
+
+                const SizedBox(height: 20),
+
+                _buildTextField(
+                  "Thương hiệu",
+                  _brandTextController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập thương hiệu';
+                    }
+                    return null;
+                  },
+                ),
+
                 const SizedBox(height: 20),
                 _buildTextField(
                   "Model xe",
@@ -330,48 +356,6 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    // Expanded(
-                    //   child: _buildTextField(
-                    //     "Ngày đăng ký",
-                    //     _dateController,
-                    //     hintText: "dd/mm/YYYY",
-                    //     inputFormatters: [
-                    //       FilteringTextInputFormatter.digitsOnly,
-                    //       LengthLimitingTextInputFormatter(8),
-                    //       TextInputFormatter.withFunction((oldValue, newValue) {
-                    //         String formatted = _formatDate(newValue.text);
-                    //         return TextEditingValue(
-                    //           text: formatted,
-                    //           selection: TextSelection.collapsed(offset: formatted.length),
-                    //         );
-                    //       }),
-                    //     ],
-                    //     validator: (value) {
-                    //       if (value == null || value.isEmpty) {
-                    //         return 'Vui lòng nhập ngày đăng ký';
-                    //       }
-                    //       final datePattern = RegExp(r'^\d{2}/\d{2}/\d{4}$');
-                    //       if (!datePattern.hasMatch(value)) {
-                    //         return 'Ngày không đúng định dạng (VD: dd/mm/YYYY)';
-                    //       }
-                    //       final parts = value.split('/');
-                    //       final day = int.tryParse(parts[0]) ?? 0;
-                    //       final month = int.tryParse(parts[1]) ?? 0;
-                    //       final year = int.tryParse(parts[2]) ?? 0;
-                    //       if (day < 1 || day > 31) {
-                    //         return 'Ngày phải từ 01 đến 31';
-                    //       }
-                    //       if (month < 1 || month > 12) {
-                    //         return 'Tháng phải từ 01 đến 12';
-                    //       }
-                    //       if (year < 1900 || year > DateTime.now().year) {
-                    //         return 'Năm không hợp lệ';
-                    //       }
-                    //       return null;
-                    //     },
-                    //   ),
-                    // ),
-                    // const SizedBox(width: 10),
                     Expanded(
                       child: _buildTextField(
                         "Màu sắc",
@@ -387,22 +371,7 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                SwitchListTile(
-                  title: const Text("Trạng thái hoạt động"),
-                  value: _status,
-                  onChanged: (value) {
-                    setState(() {
-                      _status = value;
-                    });
-                  },
-                ),
-                // const SizedBox(height: 20),
-                // _buildTextField(
-                //   "Mô tả (nếu có)",
-                //   _descriptionController,
-                //   maxLines: 3,
-                //   hintText: "Xe có bị gì không...",
+
                 // ),
                 const SizedBox(height: 20),
                 SizedBox(

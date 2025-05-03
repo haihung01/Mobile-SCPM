@@ -42,22 +42,6 @@ class DataService {
       } else {
         throw Exception('Failed to load parking lots: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Parking lots not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -81,21 +65,6 @@ class DataService {
       } else {
         throw Exception('Failed to load cars: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'Cars not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -108,27 +77,7 @@ class DataService {
         queryParameters: {'id': carId},
         options: Options(headers: {'Accept': 'application/json'}),
       );
-
-      if (response.statusCode == 200) {
-        return Car.fromJson(response.data);
-      } else {
-        throw Exception('Failed to fetch car: ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'Car not found');
-        }
-      }
-      throw Exception('Error fetching car details: ${e.toString()}');
+      return Car.fromJson(response.data);
     } catch (e) {
       throw Exception('Error fetching car details: ${e.toString()}');
     }
@@ -150,23 +99,6 @@ class DataService {
 
       print("✅ Phản hồi từ server: ${response.data}");
       return Car.fromJson(response.data);
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Car not found for update');
-        }
-      }
-      print("❌ Lỗi khi cập nhật xe: ${e.toString()}");
-      throw Exception('Error updating car: ${e.toString()}');
     } catch (e, stacktrace) {
       print("❌ Lỗi khi cập nhật xe: ${e.toString()}");
       print("🔍 Stacktrace: $stacktrace");
@@ -199,6 +131,7 @@ class DataService {
         'licensePlate': car.licensePlate,
         'registedDate': formattedDate,
         'status': car.status,
+        'brand': car.brand,
       };
 
       print("Data addcar: $payload");
@@ -214,21 +147,6 @@ class DataService {
         throw Exception(
             'Failed to add car: ${response.statusCode} - ${response.data}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Biển số xe đã tồn tại trong hệ thống';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'Resource not found');
-        }
-      }
-      throw Exception('Error adding car: ${e.toString()}');
     } catch (e) {
       throw Exception('Error adding car: ${e.toString()}');
     }
@@ -262,19 +180,6 @@ class DataService {
         throw Exception('Login failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Login failed';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'User not found');
-        }
-      }
       throw Exception('Connection error: ${e.message}');
     } catch (e) {
       throw Exception('Unknown error: $e');
@@ -294,21 +199,6 @@ class DataService {
       } else {
         throw Exception('Failed to fetch customer: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'Customer not found');
-        }
-      }
-      throw Exception('Error fetching customer: ${e.toString()}');
     } catch (e) {
       throw Exception('Error fetching customer: ${e.toString()}');
     }
@@ -322,7 +212,7 @@ class DataService {
 
       final response = await _dio.get(
         '${BaseConstants.BASE_URL}/Contract/GetContractsOfCustomer',
-        queryParameters: {'customerId': customerId},
+        queryParameters: {'customerId': customerId}, // Sửa lỗi hardcode 1
         options: Options(headers: {'Accept': 'application/json'}),
       );
 
@@ -332,22 +222,6 @@ class DataService {
       } else {
         throw Exception('Failed to load contracts: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'Contracts not found');
-        }
-      }
-      print('Error getting contracts: ${e.toString()}');
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       print('Error getting contracts: ${e.toString()}');
       throw Exception('Error occurred: ${e.toString()}');
@@ -389,20 +263,6 @@ class DataService {
             'Failed to load available parking lots: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'No available parking lots found');
-        }
-      }
       print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
       print('Request: ${e.requestOptions.method} ${e.requestOptions.path}');
       print('Request data: ${e.requestOptions.data}');
@@ -432,22 +292,6 @@ class DataService {
         throw Exception(
             'Failed to load pending contracts: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Pending contracts not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -472,22 +316,6 @@ class DataService {
         throw Exception(
             'Failed to load approved contracts: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Approved contracts not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -512,22 +340,6 @@ class DataService {
         throw Exception(
             'Failed to load paid contracts: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Paid contracts not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -552,22 +364,6 @@ class DataService {
         throw Exception(
             'Failed to load activated contracts: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Activated contracts not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -580,7 +376,7 @@ class DataService {
           '[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetRejectedContracts?customerId=$customerId');
 
       final response = await _dio.get(
-        '${BaseConstants.BASE_URL}/Contract/GetRejectedContracts',
+        '${BaseConstants.BASE_URL}/Contract/GetRejectedContracts', // Sửa endpoint đúng
         queryParameters: {'customerId': customerId},
         options: Options(headers: {'Accept': 'application/json'}),
       );
@@ -592,22 +388,6 @@ class DataService {
         throw Exception(
             'Failed to load rejected contracts: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Rejected contracts not found');
-        }
-      }
-      throw Exception('Error occurred: ${e.toString()}');
     } catch (e) {
       throw Exception('Error occurred: ${e.toString()}');
     }
@@ -633,23 +413,6 @@ class DataService {
       } else {
         throw Exception('Payment failed: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Payment failed';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Contract not found for payment');
-        }
-      }
-      print('❌ Error during payment: $e');
-      throw Exception('Payment error: $e');
     } catch (e) {
       print('❌ Error during payment: $e');
       throw Exception('Payment error: $e');
@@ -693,28 +456,15 @@ class DataService {
             'Failed to add contract: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Car or parking lot not found');
-        } else if (e.response!.statusCode == 500) {
-          final errorMessage =
-              e.response?.data['message'] ?? 'Unknown server error';
-          if (errorMessage.contains('object cycle was detected')) {
-            print('Circular reference detected in server response');
-            return null;
-          }
+      print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
+      if (e.response?.statusCode == 500) {
+        final errorMessage =
+            e.response?.data['message'] ?? 'Unknown server error';
+        if (errorMessage.contains('object cycle was detected')) {
+          print('Circular reference detected in server response');
+          return null;
         }
       }
-      print('DioError: ${e.response?.statusCode} - ${e.response?.data}');
       throw Exception('Failed to add contract: ${e.message}');
     } catch (e) {
       print('Error adding contract: $e');
@@ -739,30 +489,14 @@ class DataService {
         final String url =
             "${BaseConstants.BASE_URL}/Payment/create?paymentContractId=$paymentContractId&platform=mobile";
         print('✅ URL thanh toán: $url');
-        return url;
+        return url; // Trả về URL để sử dụng trong WebView
       } else {
-        throw Exception('Failed to create payment: ${response.statusCode}');
+        print('❌ API trả về lỗi: ${response.statusCode}');
+        return null;
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Payment contract not found');
-        }
-      }
-      print('❌ Lỗi khi gọi API tạo thanh toán: $e');
-      throw Exception('Error creating payment: $e');
     } catch (e) {
       print('❌ Lỗi khi gọi API tạo thanh toán: $e');
-      throw Exception('Error creating payment: $e');
+      return null;
     }
   }
 
@@ -784,31 +518,16 @@ class DataService {
         print('✅ URL thanh toán thành công: $url');
         return url;
       } else {
-        throw Exception('Failed to check payment: ${response.statusCode}');
+        print('❌ API trả về lỗi thanh toán: ${response.statusCode}');
+        return null;
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error occurred';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Payment contract not found');
-        }
-      }
-      print('❌ Lỗi khi gọi API kiểm tra thanh toán: $e');
-      throw Exception('Error checking payment: $e');
     } catch (e) {
-      print('❌ Lỗi khi gọi API kiểm tra thanh toán: $e');
-      throw Exception('Error checking payment: $e');
+      print('❌ Lỗi khi gọi API tạo thanh toán: $e');
+      return null;
     }
   }
 
+  // api renew contract
   Future<void> renewContract({
     required int contractId,
     required int numberMonth,
@@ -838,23 +557,6 @@ class DataService {
       } else {
         throw Exception('Gia hạn thất bại: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Gia hạn thất bại';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Contract not found for renewal');
-        }
-      }
-      print('❌ Lỗi khi gọi API gia hạn: $e');
-      throw Exception('Lỗi gia hạn: $e');
     } catch (e) {
       print('❌ Lỗi khi gọi API gia hạn: $e');
       throw Exception('Lỗi gia hạn: $e');
@@ -887,7 +589,7 @@ class DataService {
             'Accept': 'application/json',
           },
           validateStatus: (status) {
-            return status! < 500;
+            return status! < 500; // Chấp nhận tất cả status code dưới 500
           },
         ),
         data: {
@@ -901,32 +603,10 @@ class DataService {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        final responseData = response.data;
-        String errorMessage = 'Đăng ký thất bại';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
+        print('[API] Error response: ${response.data}');
+        final errorMessage = response.data['message'] ?? 'Đăng ký thất bại';
         throw Exception(errorMessage);
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Đăng ký thất bại';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Registration endpoint not found');
-        }
-      }
-      print('[API] Exception: $e');
-      throw Exception(e.toString().contains('Exception')
-          ? e.toString().replaceFirst('Exception: ', '')
-          : 'Đăng ký thất bại: ${e.toString()}');
     } catch (e) {
       print('[API] Exception: $e');
       throw Exception(e.toString().contains('Exception')
@@ -965,29 +645,13 @@ class DataService {
       } else {
         throw Exception('Failed to upload image: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error uploading image';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(errorMessage.isNotEmpty
-              ? errorMessage
-              : 'Image upload endpoint not found');
-        }
-      }
-      print('❌ Error uploading image: $e');
-      throw Exception('Error uploading image: $e');
     } catch (e) {
       print('❌ Error uploading image: $e');
       throw Exception('Error uploading image: $e');
     }
   }
 
+  // Thêm vào class DataService
   Future<double> getParkingLotPrice(int parkingLotId) async {
     try {
       final response = await _dio.get(
@@ -1001,21 +665,6 @@ class DataService {
       } else {
         throw Exception('Failed to load parking lot price');
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final responseData = e.response!.data;
-        String errorMessage = 'Error fetching parking lot price';
-        if (responseData is Map && responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-        if (e.response!.statusCode == 400) {
-          throw Exception(errorMessage);
-        } else if (e.response!.statusCode == 404) {
-          throw Exception(
-              errorMessage.isNotEmpty ? errorMessage : 'Parking lot not found');
-        }
-      }
-      throw Exception('Error fetching parking lot price: ${e.toString()}');
     } catch (e) {
       throw Exception('Error fetching parking lot price: ${e.toString()}');
     }
