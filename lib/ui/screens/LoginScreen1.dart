@@ -13,6 +13,7 @@ class LoginScreen1 extends StatefulWidget {
 class _LoginScreen1State extends State<LoginScreen1> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final DataService _dataService = DataService();
   bool _obscurePassword = true;
 
@@ -48,6 +49,64 @@ class _LoginScreen1State extends State<LoginScreen1> {
         },
       );
     }
+  }
+
+  Future<void> _showForgotPasswordDialog() async {
+    _emailController.clear();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Quên mật khẩu"),
+          content: TextField(
+            controller: _emailController,
+            decoration: InputDecoration(
+              labelText: "Nhập email",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Hủy"),
+            ),
+            TextButton(
+              onPressed: () async {
+                final email = _emailController.text.trim();
+                if (email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Vui lòng nhập email")),
+                  );
+                  return;
+                }
+                try {
+                  await _dataService.forgotPassword(email);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Vui lòng kiểm tra lại email của bạn"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  final errorMessage = e.toString().replaceFirst('Exception: ', '');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(errorMessage),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: Text("Gửi"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -118,14 +177,7 @@ class _LoginScreen1State extends State<LoginScreen1> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ForgotPasswordScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: _showForgotPasswordDialog,
                     child: const Text(
                       "Quên mật khẩu ?",
                       style: TextStyle(color: Colors.green, fontSize: 14),

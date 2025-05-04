@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:fe_capstone/models/Contract.dart';
+import 'package:fe_capstone/models/payment_contract.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/models/car_model.dart';
@@ -669,4 +670,136 @@ class DataService {
       throw Exception('Error fetching parking lot price: ${e.toString()}');
     }
   }
+
+  Future<List<PaymentContract>> getPaymentContracts(int contractId) async {
+    try {
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Contract/$contractId/PaymentContracts');
+
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Contract/$contractId/PaymentContracts',
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((e) => PaymentContract.fromJson(e)).toList();
+      } else {
+        throw Exception('Failed to load payment contracts: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        String errorMessage = 'Error occurred';
+        if (responseData is Map && responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+        if (e.response!.statusCode == 400) {
+          throw Exception(errorMessage);
+        } else if (e.response!.statusCode == 404) {
+          throw Exception(errorMessage.isNotEmpty ? errorMessage : 'Payment contracts not found');
+        }
+      }
+      throw Exception('Error fetching payment contracts: ${e.toString()}');
+    } catch (e) {
+      throw Exception('Error fetching payment contracts: ${e.toString()}');
+    }
+  }
+
+  Future<void> forgotPassword(String email) async {
+    try {
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Customer/ForgotPassword');
+      print('[API] Request body: {"email": "$email"}');
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Customer/ForgotPassword',
+        data: {'email': email},
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Password reset request successful');
+      } else {
+        throw Exception('Failed to request password reset: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        String errorMessage = 'Yêu cầu đặt lại mật khẩu thất bại';
+        if (responseData is Map && responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+        if (e.response!.statusCode == 400) {
+          throw Exception(errorMessage);
+        } else if (e.response!.statusCode == 404) {
+          throw Exception(
+              errorMessage.isNotEmpty ? errorMessage : 'Email không tồn tại');
+        }
+      }
+      print('❌ Lỗi khi gọi API quên mật khẩu: $e');
+      throw Exception('Lỗi yêu cầu đặt lại mật khẩu: $e');
+    } catch (e) {
+      print('❌ Lỗi khi gọi API quên mật khẩu: $e');
+      throw Exception('Lỗi yêu cầu đặt lại mật khẩu: $e');
+    }
+  }
+
+  Future<void> changePassword({
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    try {
+      final customerId = await getCustomerId();
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Customer/ChangePassword');
+      print(
+          '[API] Request body: {"customerId": $customerId, "newPassword": "$newPassword", "confirmPassword": "$confirmPassword"}');
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Customer/ChangePassword',
+        data: {
+          'customerId': customerId,
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Password changed successfully');
+      } else {
+        throw Exception('Failed to change password: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        String errorMessage = 'Đổi mật khẩu thất bại';
+        if (responseData is Map && responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+        if (e.response!.statusCode == 400) {
+          throw Exception(errorMessage);
+        } else if (e.response!.statusCode == 404) {
+          throw Exception(errorMessage.isNotEmpty
+              ? errorMessage
+              : 'Người dùng không tồn tại');
+        }
+      }
+      print('❌ Lỗi khi gọi API đổi mật khẩu: $e');
+      throw Exception('Lỗi đổi mật khẩu: $e');
+    } catch (e) {
+      print('❌ Lỗi khi gọi API đổi mật khẩu: $e');
+      throw Exception('Lỗi đổi mật khẩu: $e');
+    }
+  }
+
 }

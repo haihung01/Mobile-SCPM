@@ -1,4 +1,5 @@
 import 'package:fe_capstone/models/Contract.dart';
+import 'package:fe_capstone/models/payment_contract.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:fe_capstone/ui/screens/PaymentWebViewScreen.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +14,61 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  final DataService _dataService = DataService();
+  List<PaymentContract> _paymentContracts = [];
+  bool _isLoadingPayments = true;
+  String? _paymentError;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPaymentContracts();
+  }
+
+  Future<void> _fetchPaymentContracts() async {
+    try {
+      final paymentContracts =
+      await _dataService.getPaymentContracts(widget.contract.contractId);
+      setState(() {
+        _paymentContracts = paymentContracts;
+        _isLoadingPayments = false;
+      });
+    } catch (e) {
+      setState(() {
+        _paymentError = e.toString().replaceFirst('Exception: ', '');
+        _isLoadingPayments = false;
+      });
+    }
+  }
+
   String formatCurrency(double amount) {
     final format = NumberFormat("#,##0", "vi_VN");
     return format.format(amount);
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+  }
+
+  String _getPaymentStatusText(String status) {
+    switch (status) {
+      case 'Pending':
+        return 'Chờ duyệt';
+      case 'Approved':
+        return 'Đã duyệt';
+      case 'Rejected':
+        return 'Từ chối';
+      case 'Paid':
+        return 'Đã thanh toán';
+      case 'Activated':
+        return 'Đang hoạt động';
+      case 'PendingActivation':
+        return 'Chờ hiệu lực';
+      case 'Completed':
+        return 'Đã hoạt động';
+      default:
+        return status;
+    }
   }
 
   @override
@@ -56,6 +109,46 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 16),
             _buildInfoCard(
+              icon: Icons.payment,
+              title: "Thông tin thanh toán",
+              content: _isLoadingPayments
+                  ? Center(child: CircularProgressIndicator())
+                  : _paymentError != null
+                  ? Text(
+                _paymentError!,
+                style: TextStyle(color: Colors.red, fontSize: 14),
+              )
+                  : _paymentContracts.isEmpty
+                  ? Text(
+                "Không có thông tin thanh toán",
+                style: TextStyle(
+                    fontSize: 14, color: Colors.grey[600]),
+              )
+                  : Column(
+                children: _paymentContracts.map((payment) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoRow(
+                        "Số tiền thanh toán:",
+                        payment.paymentAmount != null
+                            ? "${formatCurrency(payment.paymentAmount!)} VND"
+                            : "Không có thông tin",
+                      ),
+                      _buildInfoRow(
+                        "Trạng thái:",
+                        payment.status != null
+                            ? _getPaymentStatusText(payment.status!)
+                            : "Không có thông tin",
+                      ),
+                      SizedBox(height: 8),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildInfoCard(
               icon: Icons.directions_car,
               title: "Xe đăng ký",
               content: Column(
@@ -80,11 +173,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       Text(
                         widget.contract.status == "Active"
                             ? (widget.contract.totalAllPayments != null
-                                ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
-                                : 'Chưa có thông tin thanh toán')
+                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                            : 'Chưa có thông tin thanh toán')
                             : (widget.contract.totalAmount != null
-                                ? '${formatCurrency(widget.contract.totalAmount)} VND'
-                                : 'Chưa có thông tin thanh toán'),
+                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                            : 'Chưa có thông tin thanh toán'),
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -105,9 +198,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(width: 10),
                   const Text("Thanh toán qua VNPAY",
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   const Spacer(),
-                  // const Icon(Icons.chevron_right),
                 ],
               ),
             ),
@@ -155,10 +247,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-  }
-
   Widget _buildInfoCard({
     required IconData icon,
     required String title,
@@ -188,6 +276,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           const SizedBox(height: 12),
           content,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(value, style: TextStyle(fontSize: 16)),
+          ),
         ],
       ),
     );
