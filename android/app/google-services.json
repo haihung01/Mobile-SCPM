@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "942210346350",
+    "project_id": "scpm-site",
+    "storage_bucket": "scpm-site.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942210346350:android:48fc085045ee21391b257f",
+        "android_client_info": {
+          "package_name": "com.example.fe_capstone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQ-bmMOjhv_xHWY9HNhyISnZbfAza2NW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

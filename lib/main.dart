@@ -1,28 +1,28 @@
-import 'package:fe_capstone/ui/ChatScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/BottomTabNavCustomer.dart';
-import 'package:fe_capstone/ui/CustomerUI/LocationScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/HomeScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
+import 'package:fe_capstone/firebase_msg.dart';
+import 'package:fe_capstone/firebase_options.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
-import 'package:fe_capstone/ui/CustomerUI/VechicleScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/WalletScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/parking-management/ListParkingScreen.dart';
-import 'package:fe_capstone/ui/PLOwnerUI/BottomTabNavPlo.dart';
-import 'package:fe_capstone/ui/PLOwnerUI/ContractExpiredScreen.dart';
-import 'package:fe_capstone/ui/PLOwnerUI/PloChatScreen.dart';
-import 'package:fe_capstone/ui/PLOwnerUI/PloHomeScreen.dart';
-import 'package:fe_capstone/ui/screens/LoginScreen.dart';
-import 'package:fe_capstone/ui/screens/LoginScreen1.dart';
-import 'package:fe_capstone/ui/screens/RegisterScreen.dart';
-import 'package:fe_capstone/ui/screens/RegisterScreen1.dart';
-import 'package:fe_capstone/ui/screens/WelcomeScreen.dart';
+import 'package:fe_capstone/ui/ChatScreen.dart'; // Import màn hình cần điều hướng
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 late Size mq;
 late double fem;
 late double ffem;
 
-void main() {
+// Khởi tạo NavigatorKey để điều hướng
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+Future<void> _initializeFirebase() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _initializeFirebase();
+  final firebaseMsg = FirebaseMsg();
+  await firebaseMsg.initFCM();
   runApp(const MyApp());
 }
 
@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
     fem = mq.width / baseWidth;
     ffem = fem * 0.87;
     return MaterialApp(
+      navigatorKey: navigatorKey, // Thêm navigatorKey
       title: 'Capstone Project',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color(0xFF6EC2F7)),

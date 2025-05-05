@@ -109,46 +109,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 16),
             _buildInfoCard(
-              icon: Icons.payment,
-              title: "Thông tin thanh toán",
-              content: _isLoadingPayments
-                  ? Center(child: CircularProgressIndicator())
-                  : _paymentError != null
-                  ? Text(
-                _paymentError!,
-                style: TextStyle(color: Colors.red, fontSize: 14),
-              )
-                  : _paymentContracts.isEmpty
-                  ? Text(
-                "Không có thông tin thanh toán",
-                style: TextStyle(
-                    fontSize: 14, color: Colors.grey[600]),
-              )
-                  : Column(
-                children: _paymentContracts.map((payment) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInfoRow(
-                        "Số tiền thanh toán:",
-                        payment.paymentAmount != null
-                            ? "${formatCurrency(payment.paymentAmount!)} VND"
-                            : "Không có thông tin",
-                      ),
-                      _buildInfoRow(
-                        "Trạng thái:",
-                        payment.status != null
-                            ? _getPaymentStatusText(payment.status!)
-                            : "Không có thông tin",
-                      ),
-                      SizedBox(height: 8),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildInfoCard(
               icon: Icons.directions_car,
               title: "Xe đăng ký",
               content: Column(
