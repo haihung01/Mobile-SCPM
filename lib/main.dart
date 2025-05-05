@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
     fem = mq.width / baseWidth;
     ffem = fem * 0.87;
     return MaterialApp(
-      navigatorKey: navigatorKey, // Thêm navigatorKey
+      navigatorKey: navigatorKey,
       title: 'Capstone Project',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color(0xFF6EC2F7)),

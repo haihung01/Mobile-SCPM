@@ -863,6 +863,92 @@ class DataService {
     }
   }
 
+  // feedback
+
+// get
+  Future<List<Map<String, dynamic>>> getFeedbacksOfCustomer(
+      int customerId) async {
+    try {
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Feedback/GetFeedbacksOfCustomer',
+        queryParameters: {'customerId': customerId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        throw Exception('Failed to load feedbacks: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error getting feedbacks: $e');
+      throw Exception('Error occurred: $e');
+    }
+  }
+
+// add
+  Future<void> sendFeedback(int customerId, String message) async {
+    try {
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Feedback/Add',
+        data: {
+          'customerId': customerId,
+          'message': message,
+        },
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('✅ Feedback sent successfully');
+      } else {
+        throw Exception('Failed to send feedback: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error sending feedback: $e');
+      throw Exception('Error sending feedback: $e');
+    }
+  }
+
+  // update
+  Future<void> updateFeedback(int feedbackId, String message) async {
+    try {
+      await _dio.put(
+        '${BaseConstants.BASE_URL}/Feedback/Update',
+        data: {
+          'feedbackId': feedbackId,
+          'message': message,
+        },
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+        ),
+      );
+    } catch (e) {
+      throw Exception('Error updating feedback: $e');
+    }
+  }
+
+  // xóa
+  Future<void> deleteFeedback(int feedbackId) async {
+    try {
+      final response = await _dio.delete(
+        '${BaseConstants.BASE_URL}/Feedback/$feedbackId',
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        // print('✅ Xóa feedback thành công');
+      } else {
+        throw Exception('Xóa feedback thất bại: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Lỗi xóa feedback: $e');
+      throw Exception('Error deleting feedback: $e');
+    }
+  }
+
   Future<void> register({
     required String firstName,
     required String lastName,
