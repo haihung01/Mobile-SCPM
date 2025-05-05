@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fe_capstone/service/data_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewFeedbackScreen extends StatelessWidget {
   final TextEditingController feedbackController = TextEditingController();
@@ -78,11 +80,45 @@ class NewFeedbackScreen extends StatelessWidget {
                   width: 150,
                   height: 40,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async {
+                      final message = feedbackController.text.trim();
+                      if (message.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Vui lòng nhập nội dung')),
+                        );
+                        return;
+                      }
+
+                      try {
+                        final prefs = await SharedPreferences.getInstance();
+                        final customerId = prefs.getInt('ownerId');
+
+                        if (customerId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Không tìm thấy thông tin người dùng')),
+                          );
+                          return;
+                        }
+
+                        final dataService = DataService();
+                        await dataService.sendFeedback(customerId, message);
+
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(content: Text('Gửi phản hồi thành công')),
+                        // );
+                        Navigator.pop(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text('Lỗi gửi phản hồi: ${e.toString()}')),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                      backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),

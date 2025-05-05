@@ -1,20 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:fe_capstone/service/data_service.dart';
 
-class FeedbackDetailScreen extends StatelessWidget {
+class FeedbackDetailScreen extends StatefulWidget {
   final String title;
   final String content;
+  final int feedbackId; // cần feedbackId để update
 
   const FeedbackDetailScreen({
     Key? key,
     required this.title,
     required this.content,
+    required this.feedbackId,
   }) : super(key: key);
+
+  @override
+  _FeedbackDetailScreenState createState() => _FeedbackDetailScreenState();
+}
+
+class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
+  bool isEditing = false;
+  late TextEditingController _controller;
+  bool isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.content);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> updateFeedback() async {
+    setState(() {
+      isSubmitting = true;
+    });
+
+    try {
+      final dataService = DataService();
+      await dataService.updateFeedback(widget.feedbackId, _controller.text);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cập nhật thành công!')),
+      );
+
+      setState(() {
+        isEditing = false;
+      });
+    } catch (e) {
+      print('❌ Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi cập nhật: $e')),
+      );
+    } finally {
+      setState(() {
+        isSubmitting = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.3,
+      initialChildSize: 0.55,
+      minChildSize: 0.4,
       maxChildSize: 0.9,
       expand: false,
       builder: (context, scrollController) {
@@ -25,14 +77,14 @@ class FeedbackDetailScreen extends StatelessWidget {
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Tiêu đề + nút đóng
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: Text(
-                      title,
+                      widget.title,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
@@ -47,6 +99,7 @@ class FeedbackDetailScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
+              // Nội dung cuộn
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
@@ -59,27 +112,80 @@ class FeedbackDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.insert_drive_file, color: Colors.grey),
-                            SizedBox(width: 8),
-                            Text(
-                              "Nội Dung",
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "* Nội dung phản hồi:",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic,
+                              decoration: TextDecoration.underline,
+                              color: Colors.red,
                             ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          content,
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                        isEditing
+                            ? TextField(
+                                controller: _controller,
+                                maxLines: null,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Nhập nội dung phản hồi...',
+                                ),
+                              )
+                            : Text(
+                                _controller.text,
+                                style: const TextStyle(fontSize: 16),
+                              ),
                       ],
                     ),
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.center,
+                child: isEditing
+                    ? ElevatedButton(
+                        onPressed: isSubmitting ? null : updateFeedback,
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.green),
+                          padding: MaterialStateProperty.all(
+                            const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                        ),
+                        child: isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Gửi'),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            isEditing = true;
+                          });
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.blue),
+                          padding: MaterialStateProperty.all(
+                            const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                        ),
+                        child: const Text('Chỉnh sửa'),
+                      ),
+              )
             ],
           ),
         );
