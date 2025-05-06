@@ -1243,5 +1243,43 @@ class DataService {
     }
   }
 
-  // khoảng cách code
+  Future<List<PaymentContract>> getPaymentHistories() async {
+    try {
+      final customerId = await getCustomerId();
+      print(
+          '[API] Calling: ${BaseConstants.BASE_URL}/Payment/Histories?customerId=$customerId');
+
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Payment/Histories',
+        queryParameters: {'customerId': customerId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((e) => PaymentContract.fromJson(e)).toList();
+      } else {
+        throw Exception(
+            'Failed to load payment histories: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        String errorMessage = 'Error occurred';
+        if (responseData is Map && responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+        if (e.response!.statusCode == 400) {
+          throw Exception(errorMessage);
+        } else if (e.response!.statusCode == 404) {
+          throw Exception(errorMessage.isNotEmpty
+              ? errorMessage
+              : 'Payment histories not found');
+        }
+      }
+      throw Exception('Error fetching payment histories: ${e.toString()}');
+    } catch (e) {
+      throw Exception('Error fetching payment histories: ${e.toString()}');
+    }
+  }
 }

@@ -176,8 +176,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   Widget _buildDetailView(Car car) {
     return Column(
       children: [
-        _infoTile('Tên xe', car.model),
+        // _infoTile('Tên xe', car.model),
         _infoTile('Thương hiệu', car.brand),
+        _infoTile('Model xe ', car.model),
         _infoTile('Biển số', car.licensePlate),
         _infoTile('Màu sắc', car.color),
         // _infoTile('Ngày đăng ký', car.registedDate),
@@ -215,10 +216,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       key: _formKey,
       child: Column(
         children: [
-          _textField('Tên xe', _editableCar.model,
-              (value) => _editableCar = _editableCar.copyWith(model: value)),
           _textField('Thương hiệu', _editableCar.brand,
               (value) => _editableCar = _editableCar.copyWith(brand: value)),
+          _textField('Model xe', _editableCar.model,
+              (value) => _editableCar = _editableCar.copyWith(model: value)),
 
           // Biển số: chỉ hiển thị, không cho sửa
           Padding(

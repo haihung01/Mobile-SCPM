@@ -119,8 +119,27 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
   }
 
   Future<void> _submitForm() async {
+    if (_thumbnailUrl == null) {
+      // ✅ kiểm tra bắt buộc có hình
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Thông báo'),
+          content: const Text('Vui lòng chọn hình ảnh cho xe!'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Đóng'),
+            ),
+          ],
+        ),
+      );
+      return;
+
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
-      // Kiểm tra nếu đang upload hình ảnh
       if (_isUploading) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đang tải hình ảnh, vui lòng chờ!')),
@@ -290,16 +309,16 @@ class _NewVehicleScreenState extends State<NewVehicleScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                _buildTextField(
-                  "Tên xe",
-                  _brandController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập tên xe';
-                    }
-                    return null;
-                  },
-                ),
+                // _buildTextField(
+                //   "Tên xe",
+                //   _brandController,
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return 'Vui lòng nhập tên xe';
+                //     }
+                //     return null;
+                //   },
+                // ),
 
                 const SizedBox(height: 20),
 
