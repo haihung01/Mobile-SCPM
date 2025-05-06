@@ -196,7 +196,100 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                 ],
               ),
             ),
-            // ... (Rest of the build method remains unchanged)
+
+            SizedBox(height: 16),
+
+            // Thông tin xe
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: _boxDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.directions_car, color: Colors.grey[700]),
+                      SizedBox(width: 8),
+                      Text("Thông tin xe",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[800])),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  _buildInfoRow("Biển số:", widget.contract.car.licensePlate),
+                  _buildInfoRow("Màu sắc:",
+                      widget.contract.car.color ?? 'Không có thông tin'),
+                  _buildInfoRow("Model:", widget.contract.car.model),
+                  Divider(height: 24, thickness: 1),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Tổng chi phí",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        widget.contract.status == "Active"
+                            ? (widget.contract.totalAllPayments != null
+                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                            : 'Chưa có thông tin thanh toán')
+                            : (widget.contract.totalAmount != null
+                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                            : 'Chưa có thông tin thanh toán'),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+
+            SizedBox(height: 16),
+
+            // Thông tin bãi đỗ
+            _buildParkingCard(
+              widget.contract.parkingLotName,
+              widget.contract.parkingLotAddress,
+              widget.contract.parkingSpaceName,
+              widget.contract.lat,
+              widget.contract.long,
+            ),
+
+            // Nút Gia hạn
+            if (widget.contract.status == 'Active') ...[
+              SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RenewScreen(contract: widget.contract),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Gia hạn',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ],
         ),
       ),
