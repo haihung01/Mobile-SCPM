@@ -184,7 +184,7 @@ class DataService {
         final dateParts = car.registedDate.split('/');
         if (dateParts.length == 3) {
           formattedDate =
-          '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
+              '${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00.000Z';
         } else {
           formattedDate = DateTime.now().toIso8601String();
         }
@@ -864,7 +864,6 @@ class DataService {
   }
 
   // feedback
-
 // get
   Future<List<Map<String, dynamic>>> getFeedbacksOfCustomer(
       int customerId) async {
@@ -1243,4 +1242,6 @@ class DataService {
       throw Exception('Lỗi đổi mật khẩu: $e');
     }
   }
+
+  // khoảng cách code
 }

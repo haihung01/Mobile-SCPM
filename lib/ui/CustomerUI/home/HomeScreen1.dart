@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:fe_capstone/ui/ChatScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/chat/ChatScreenSCPM.dart';
+import 'package:fe_capstone/ui/CustomerUI/chat/WebView.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleManagementScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -362,10 +362,19 @@ class _HomeScreenState extends State<HomeScreen1> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          final prefs = await SharedPreferences.getInstance();
+          final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+          final customerId = isLoggedIn ? (prefs.getInt('ownerId') ?? 0) : 0;
+
+          final url =
+              'https://scpmbe-hrhheedhh7gmatev.southeastasia-01.azurewebsites.net/api/Customer/$customerId/chat';
+
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ChatScreenSCPM()),
+            MaterialPageRoute(
+              builder: (context) => ChatWebViewScreen(url),
+            ),
           );
         },
         backgroundColor: Colors.green,
