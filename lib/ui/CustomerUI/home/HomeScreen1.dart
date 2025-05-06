@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fe_capstone/ui/ChatScreen.dart';
+import 'package:fe_capstone/ui/CustomerUI/PaymentHistoryScreen.dart';
 import 'package:fe_capstone/ui/CustomerUI/chat/ChatScreenSCPM.dart';
 import 'package:fe_capstone/ui/CustomerUI/vehicle-management/VehicleManagementScreen.dart';
 import 'package:flutter/material.dart';
@@ -259,7 +260,8 @@ class _HomeScreenState extends State<HomeScreen1> {
                   _buildCard(
                     Icons.history_toggle_off_sharp,
                     "Lịch sử",
-                    () {},
+                        () => _handleProtectedNavigation(
+                        context, PaymentHistoryScreen()), // Updated to navigate to PaymentHistoryScreen
                     iconColor: const Color.fromARGB(255, 235, 110, 101),
                   ),
                 ],
