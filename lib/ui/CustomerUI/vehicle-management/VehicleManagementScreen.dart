@@ -158,7 +158,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                vehicle.model,
+                '${vehicle.brand}${vehicle.model}',
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 maxLines: 1,

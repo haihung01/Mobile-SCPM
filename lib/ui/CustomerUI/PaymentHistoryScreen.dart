@@ -11,7 +11,7 @@ class PaymentHistoryScreen extends StatefulWidget {
 
 class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
   late Future<List<PaymentContract>> _paymentHistoriesFuture;
-  int _selectedIndex = 3; // Set to 3 since this is the history tab
+  int _selectedIndex = 0;
 
   @override
   void initState() {

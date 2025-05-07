@@ -246,13 +246,13 @@ class _ContractScreenState extends State<ContractScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 11.5),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Hợp Đồng Xe ${contract.car.model}",
+                    "Hợp đồng xe ${contract.car.model}",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
