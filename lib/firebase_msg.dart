@@ -8,6 +8,11 @@ FlutterLocalNotificationsPlugin();
 class FirebaseMsg {
   final FirebaseMessaging _msgService = FirebaseMessaging.instance;
 
+  Future<String?> getDeviceToken() async {
+    String? token = await _msgService.getToken();
+    print("Token device: $token");
+    return token;
+  }
   // Khởi tạo FCM
   Future<void> initFCM() async {
     // Yêu cầu quyền thông báo

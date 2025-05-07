@@ -1,3 +1,4 @@
+import 'package:fe_capstone/firebase_msg.dart';
 import 'package:fe_capstone/ui/screens/ForgotPasswordScreen.dart';
 import 'package:fe_capstone/ui/screens/RegisterScreen.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,15 @@ class _LoginScreen1State extends State<LoginScreen1> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
+
+      // Lấy FCM token và đăng ký thiết bị
+      final firebaseMsg = FirebaseMsg();
+      String? token = await firebaseMsg.getDeviceToken();
+      if (token != null) {
+        await _dataService.registerDevice(token);
+      } else {
+        print('Không lấy được FCM token');
+      }
 
       Navigator.pushReplacement(
         context,

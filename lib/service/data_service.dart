@@ -8,6 +8,7 @@ import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/models/car_model.dart';
 import 'package:fe_capstone/models/customer_model.dart';
 import 'package:fe_capstone/models/parking_lot_model.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class DataService {
   final Dio _dio = Dio();
@@ -1318,6 +1319,71 @@ class DataService {
       throw Exception('Error fetching contract: ${e.toString()}');
     } catch (e) {
       throw Exception('Error fetching contract: ${e.toString()}');
+    }
+  }
+
+  Future<void> registerDevice(String deviceToken) async {
+    try {
+      final customerId = await getCustomerId();
+      final deviceInfo = DeviceInfoPlugin();
+      String deviceId;
+
+      // Lấy device ID dựa trên nền tảng
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        deviceId = androidInfo.id; // ID Android duy nhất
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        deviceId = iosInfo.identifierForVendor ?? 'unknown_ios_device';
+      } else {
+        throw Exception('Nền tảng không được hỗ trợ');
+      }
+
+      final requestData = {
+        'customerId': customerId,
+        'deviceId': deviceId,
+        'deviceToken': deviceToken,
+      };
+
+      print('[API] Gọi: ${BaseConstants.BASE_URL}/Fcm/RegisterDevice');
+      print('[API] Dữ liệu yêu cầu: $requestData');
+
+      final response = await _dio.post(
+        '${BaseConstants.BASE_URL}/Fcm/RegisterDevice',
+        data: requestData,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('✅ Đăng ký thiết bị thành công');
+      } else {
+        throw Exception('Đăng ký thiết bị thất bại: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        String errorMessage = 'Lỗi xảy ra khi đăng ký thiết bị';
+        if (responseData is Map && responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+        if (e.response!.statusCode == 400) {
+          throw Exception(errorMessage);
+        } else if (e.response!.statusCode == 404) {
+          throw Exception(errorMessage.isNotEmpty
+              ? errorMessage
+              : 'Endpoint đăng ký thiết bị không tìm thấy');
+        }
+      }
+      print('❌ Lỗi khi gọi API đăng ký thiết bị: $e');
+      throw Exception('Lỗi đăng ký thiết bị: $e');
+    } catch (e) {
+      print('❌ Lỗi khi gọi API đăng ký thiết bị: $e');
+      throw Exception('Lỗi đăng ký thiết bị: $e');
     }
   }
 
