@@ -1,4 +1,5 @@
 import 'package:fe_capstone/service/data_service.dart';
+import 'package:fe_capstone/ui/CustomerUI/chat/WebView.dart';
 import 'package:fe_capstone/ui/CustomerUI/home/HomeScreen1.dart';
 import 'package:fe_capstone/ui/CustomerUI/profile/ProfileDetailScreen.dart';
 import 'package:fe_capstone/ui/screens/ChangePasswordScreen.dart';
@@ -36,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen1()),
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -47,6 +48,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: const Text(
           "SPCM",
           style: TextStyle(
@@ -85,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     final dataService = DataService();
                     final userData =
-                    await dataService.getCustomerById(customerId);
+                        await dataService.getCustomerById(customerId);
 
                     Navigator.push(
                       context,
@@ -106,7 +113,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     const CircleAvatar(
                       radius: 30,
-                      backgroundImage: AssetImage("assets/images/profile1.webp"),
+                      backgroundImage:
+                          AssetImage("assets/images/profile1.webp"),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -144,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildMenuItem(
                     Icons.lock_outline,
                     "Mật Khẩu",
-                        () => Navigator.push(
+                    () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChangePasswordScreen(),
@@ -184,9 +192,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () async {
+          final prefs = await SharedPreferences.getInstance();
+          final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+          final customerId = isLoggedIn ? (prefs.getInt('ownerId') ?? 0) : 0;
+
+          final url =
+              'https://scpmbe-hrhheedhh7gmatev.southeastasia-01.azurewebsites.net/api/Customer/$customerId/chat';
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatWebViewScreen(url),
+            ),
+          );
+        },
         backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: Image.network(
+            'https://static.vecteezy.com/system/resources/previews/005/064/963/non_2x/letter-p-alphabet-natural-green-icons-leaf-logo-free-vector.jpg',
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomFooter(
@@ -204,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       trailing:
-      const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
       onTap: onTap,
     );
   }

@@ -42,7 +42,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   Future<void> _fetchPaymentContracts() async {
     try {
       final paymentContracts =
-      await _dataService.getPaymentContracts(widget.contract.contractId);
+          await _dataService.getPaymentContracts(widget.contract.contractId);
       setState(() {
         _paymentContracts = paymentContracts;
         _isLoadingPayments = false;
@@ -231,11 +231,11 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                       Text(
                         widget.contract.status == "Active"
                             ? (widget.contract.totalAllPayments != null
-                            ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
-                            : 'Chưa có thông tin thanh toán')
+                                ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                                : 'Chưa có thông tin thanh toán')
                             : (widget.contract.totalAmount != null
-                            ? '${formatCurrency(widget.contract.totalAmount)} VND'
-                            : 'Chưa có thông tin thanh toán'),
+                                ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                                : 'Chưa có thông tin thanh toán'),
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -344,7 +344,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               children: [
                 Text(title,
                     style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
                 Row(
                   children: [

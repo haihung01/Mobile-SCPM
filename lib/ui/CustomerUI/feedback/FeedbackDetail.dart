@@ -43,8 +43,20 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
       final dataService = DataService();
       await dataService.updateFeedback(widget.feedbackId, _controller.text);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cập nhật thành công!')),
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Thành công'),
+          content: const Text('Cập nhật phản hồi thành công!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
       );
 
       setState(() {
