@@ -1282,4 +1282,43 @@ class DataService {
       throw Exception('Error fetching payment histories: ${e.toString()}');
     }
   }
+
+  Future<Contract> getContractById(int contractId) async {
+    try {
+      print('[API] Calling: ${BaseConstants.BASE_URL}/Contract/GetById?id=$contractId');
+
+      final response = await _dio.get(
+        '${BaseConstants.BASE_URL}/Contract/GetById',
+        queryParameters: {'id': contractId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data == null) {
+          throw Exception('Contract data is null');
+        }
+        return Contract.fromJson(data);
+      } else {
+        throw Exception('Failed to load contract: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        String errorMessage = 'Error occurred';
+        if (responseData is Map && responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+        if (e.response!.statusCode == 400) {
+          throw Exception(errorMessage);
+        } else if (e.response!.statusCode == 404) {
+          throw Exception(errorMessage.isNotEmpty ? errorMessage : 'Contract not found');
+        }
+      }
+      throw Exception('Error fetching contract: ${e.toString()}');
+    } catch (e) {
+      throw Exception('Error fetching contract: ${e.toString()}');
+    }
+  }
+
 }

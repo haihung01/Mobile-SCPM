@@ -1,5 +1,6 @@
 class PaymentContract {
   final int? paymentContractId;
+  final int? contractId;
   final String? startDate;
   final String? endDate;
   final double? pricePerMonth;
@@ -14,6 +15,7 @@ class PaymentContract {
 
   PaymentContract({
     this.paymentContractId,
+    this.contractId,
     this.startDate,
     this.endDate,
     this.pricePerMonth,
@@ -31,7 +33,10 @@ class PaymentContract {
     return PaymentContract(
       paymentContractId: json['paymentContractId'] is int
           ? json['paymentContractId'] as int?
-          : null, // Handle non-int values
+          : null,
+      contractId: json['contractId'] is int
+          ? json['contractId'] as int?
+          : null,
       startDate: json['startDate'] is String ? json['startDate'] as String? : null,
       endDate: json['endDate'] is String ? json['endDate'] as String? : null,
       pricePerMonth: json['pricePerMonth'] is num

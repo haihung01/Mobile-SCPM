@@ -1,8 +1,6 @@
 import 'package:fe_capstone/models/Contract.dart';
-import 'package:fe_capstone/models/payment_contract.dart'; // Add this import
-import 'package:fe_capstone/service/data_service.dart'; // Add this import
-import 'package:fe_capstone/ui/CustomerUI/contract/ContractScreen.dart';
-import 'package:fe_capstone/ui/CustomerUI/contract/RenewContractDetailScreen.dart';
+import 'package:fe_capstone/models/payment_contract.dart';
+import 'package:fe_capstone/service/data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,43 +12,43 @@ class UrlConstant {
       'https://www.google.com/maps/search/?api=1&query=';
 }
 
-class ContractDetailScreen extends StatefulWidget {
-  final Contract contract;
+class PaymentHistoryDetail extends StatefulWidget {
+  final PaymentContract paymentContract;
 
-  const ContractDetailScreen({super.key, required this.contract});
+  const PaymentHistoryDetail({super.key, required this.paymentContract});
+
   @override
-  _ListContractDetailScreenState createState() =>
-      _ListContractDetailScreenState();
+  _ListPaymentHistoryDetailState createState() =>
+      _ListPaymentHistoryDetailState();
 }
 
-class _ListContractDetailScreenState extends State<ContractDetailScreen> {
-  String? selectedCar;
-  DateTime selectedDate = DateTime.now();
-  final DataService _dataService = DataService(); // Add DataService instance
-  List<PaymentContract> _paymentContracts = []; // Store payment contracts
-  bool _isLoadingPayments = true; // Track loading state
-  String? _paymentError; // Store error message if any
+class _ListPaymentHistoryDetailState extends State<PaymentHistoryDetail> {
+  final DataService _dataService = DataService();
+  Contract? contract;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    selectedCar = widget.contract.car.model;
-    selectedDate = widget.contract.startDate;
-    _fetchPaymentContracts();
+    _fetchContractDetails();
   }
 
-  Future<void> _fetchPaymentContracts() async {
+  Future<void> _fetchContractDetails() async {
     try {
-      final paymentContracts =
-          await _dataService.getPaymentContracts(widget.contract.contractId);
+      final contractId = widget.paymentContract.contractId;
+      if (contractId == null) {
+        throw Exception('Contract ID is null');
+      }
+      final fetchedContract = await _dataService.getContractById(contractId);
       setState(() {
-        _paymentContracts = paymentContracts;
-        _isLoadingPayments = false;
+        contract = fetchedContract;
+        _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _paymentError = e.toString().replaceFirst('Exception: ', '');
-        _isLoadingPayments = false;
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        _isLoading = false;
       });
     }
   }
@@ -114,6 +112,46 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.green,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+          centerTitle: true,
+          title: Text(
+            'Chi tiết giao dịch',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_errorMessage != null || contract == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.green,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+          centerTitle: true,
+          title: Text(
+            'Chi tiết giao dịch',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+        body: Center(child: Text(_errorMessage ?? 'Không tìm thấy hợp đồng')),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -125,7 +163,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         ),
         centerTitle: true,
         title: Text(
-          'Hợp đồng ${widget.contract.car.brand}${widget.contract.car.model}',
+          'Hợp đồng ${contract!.car.brand}${contract!.car.model}',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
@@ -133,6 +171,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            SizedBox(height: 16),
             Container(
               padding: EdgeInsets.all(16),
               decoration: _boxDecoration(),
@@ -156,16 +195,14 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   ),
                   SizedBox(height: 12),
                   _buildInfoRow(
-                      "Mã hợp đồng:", widget.contract.contractId.toString()),
+                      "Mã hợp đồng:", contract!.contractId.toString()),
                   _buildInfoRow(
-                      "Trạng thái:", _getStatusText(widget.contract.status)),
-                  _buildInfoRow("Lý do:", _getStatusText(widget.contract.note)),
+                      "Ngày thanh toán:", widget.paymentContract.paymentDate.toString()),
+                  _buildInfoRow("Lý do:", contract!.note ?? 'Không có'),
                 ],
               ),
             ),
             SizedBox(height: 16),
-
-            // Thời gian để xe
             Container(
               padding: EdgeInsets.all(16),
               decoration: _boxDecoration(),
@@ -188,18 +225,13 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                     ],
                   ),
                   SizedBox(height: 12),
-                  _buildInfoRow(
-                      "Từ ngày:", _formatDate(widget.contract.startDate)),
-                  _buildInfoRow(
-                      "Đến ngày:", _formatDate(widget.contract.endDate)),
+                  _buildInfoRow("Từ ngày:", _formatDate(contract!.startDate)),
+                  _buildInfoRow("Đến ngày:", _formatDate(contract!.endDate)),
                   SizedBox(height: 8),
                 ],
               ),
             ),
-
             SizedBox(height: 16),
-
-            // Thông tin xe
             Container(
               padding: EdgeInsets.all(16),
               decoration: _boxDecoration(),
@@ -217,10 +249,11 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                     ],
                   ),
                   SizedBox(height: 12),
-                  _buildInfoRow("Biển số:", widget.contract.car.licensePlate),
-                  _buildInfoRow("Tên xe:", widget.contract.car.brand + widget.contract.car.model),
-                  _buildInfoRow("Màu sắc:",
-                      widget.contract.car.color ?? 'Không có thông tin'),
+                  _buildInfoRow("Biển số:", contract!.car.licensePlate),
+                  _buildInfoRow(
+                      "Tên xe:", contract!.car.brand + contract!.car.model),
+                  _buildInfoRow(
+                      "Màu sắc:", contract!.car.color ?? 'Không có thông tin'),
                   Divider(height: 24, thickness: 1),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -228,68 +261,25 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                       Text("Tổng chi phí",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(
-                        widget.contract.status == "Active"
-                            ? (widget.contract.totalAllPayments != null
-                                ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
-                                : 'Chưa có thông tin thanh toán')
-                            : (widget.contract.totalAmount != null
-                                ? '${formatCurrency(widget.contract.totalAmount)} VND'
-                                : 'Chưa có thông tin thanh toán'),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black),
-                      ),
+                      Text('${formatCurrency(widget.paymentContract.paymentAmount!)} VND', style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black),
+                    ),
+
                     ],
                   )
                 ],
               ),
             ),
-
             SizedBox(height: 16),
-
-            // Thông tin bãi đỗ
             _buildParkingCard(
-              widget.contract.parkingLotName,
-              widget.contract.parkingLotAddress,
-              widget.contract.parkingSpaceName,
-              widget.contract.lat,
-              widget.contract.long,
+              contract!.parkingLotName,
+              contract!.parkingLotAddress,
+              contract!.parkingSpaceName,
+              contract!.lat,
+              contract!.long,
             ),
-
-            // Nút Gia hạn
-            if (widget.contract.status == 'Active') ...[
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => RenewScreen(contract: widget.contract),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Gia hạn',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              )
-            ],
           ],
         ),
       ),
@@ -395,27 +385,6 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   String _padZero(int number) => number.toString().padLeft(2, '0');
 
   String _getStatusText(String status) {
-    switch (status) {
-      case 'Pending':
-        return 'Chờ duyệt';
-      case 'Approved':
-        return 'Đã duyệt';
-      case 'Rejected':
-        return 'Từ chối';
-      case 'Paid':
-        return 'Đã thanh toán';
-      case 'Activated':
-        return 'Đang hoạt động';
-      case 'PendingActivation':
-        return 'Chờ hiệu lực';
-      case 'Completed':
-        return 'Đã hoạt động';
-      default:
-        return status;
-    }
-  }
-
-  String _getPaymentStatusText(String status) {
     switch (status) {
       case 'Pending':
         return 'Chờ duyệt';

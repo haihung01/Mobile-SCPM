@@ -229,7 +229,7 @@ class _RenewScreenState extends State<RenewScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInfoRow("Biển số:", widget.contract.car.licensePlate),
-                  _buildInfoRow("Model:", widget.contract.car.model),
+                  _buildInfoRow("Tên xe:", widget.contract.car.brand + widget.contract.car.model),
                   _buildInfoRow(
                       "Màu sắc:", widget.contract.car.color ?? 'Không có'),
                 ],
