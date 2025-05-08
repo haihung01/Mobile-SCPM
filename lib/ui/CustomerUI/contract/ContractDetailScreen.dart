@@ -42,7 +42,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
   Future<void> _fetchPaymentContracts() async {
     try {
       final paymentContracts =
-      await _dataService.getPaymentContracts(widget.contract.contractId);
+          await _dataService.getPaymentContracts(widget.contract.contractId);
       setState(() {
         _paymentContracts = paymentContracts;
         _isLoadingPayments = false;
@@ -218,37 +218,69 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                   ),
                   SizedBox(height: 12),
                   _buildInfoRow("Biển số:", widget.contract.car.licensePlate),
-                  _buildInfoRow("Tên xe:", widget.contract.car.brand + widget.contract.car.model),
+                  _buildInfoRow("Tên xe:",
+                      widget.contract.car.brand + widget.contract.car.model),
                   _buildInfoRow("Màu sắc:",
                       widget.contract.car.color ?? 'Không có thông tin'),
                   Divider(height: 24, thickness: 1),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isPaymentVisible = !_isPaymentVisible;
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Tổng chi phí",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text(
-                          widget.contract.status == "Active"
-                              ? (widget.contract.totalAllPayments != null
-                              ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
-                              : 'Chưa có thông tin thanh toán')
-                              : (widget.contract.totalAmount != null
-                              ? '${formatCurrency(widget.contract.totalAmount)} VND'
-                              : 'Chưa có thông tin thanh toán'),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.black),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isPaymentVisible = !_isPaymentVisible;
+                          });
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Tổng chi phí",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              widget.contract.status == "Active"
+                                  ? (widget.contract.totalAllPayments != null
+                                      ? '${formatCurrency(widget.contract.totalAllPayments)} VND'
+                                      : 'Chưa có thông tin thanh toán')
+                                  : (widget.contract.totalAmount != null
+                                      ? '${formatCurrency(widget.contract.totalAmount)} VND'
+                                      : 'Chưa có thông tin thanh toán'),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(),
+                          icon: AnimatedRotation(
+                            turns: _isPaymentVisible ? 0.5 : 0,
+                            duration: Duration(milliseconds: 300),
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 24,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPaymentVisible = !_isPaymentVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   )
                 ],
               ),
@@ -280,40 +312,56 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
                     _isLoadingPayments
                         ? Center(child: CircularProgressIndicator())
                         : _paymentError != null
-                        ? Text(
-                      _paymentError!,
-                      style: TextStyle(color: Colors.red, fontSize: 14),
-                    )
-                        : _paymentContracts.isEmpty
-                        ? Text(
-                      "Không có thông tin thanh toán",
-                      style: TextStyle(
-                          fontSize: 14, color: Colors.grey[600]),
-                    )
-                        : Column(
-                      children: _paymentContracts.map((payment) {
-                        return Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            _buildInfoRow(
-                              "Số tiền thanh toán:",
-                              payment.paymentAmount != null
-                                  ? "${formatCurrency(payment.paymentAmount!)} VND"
-                                  : "Không có thông tin",
-                            ),
-                            _buildInfoRow(
-                              "Trạng thái:",
-                              payment.status != null
-                                  ? _getPaymentStatusText(
-                                  payment.status!)
-                                  : "Không có thông tin",
-                            ),
-                            SizedBox(height: 8),
-                          ],
-                        );
-                      }).toList(),
-                    ),
+                            ? Text(
+                                _paymentError!,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 14),
+                              )
+                            : _paymentContracts.isEmpty
+                                ? Text(
+                                    "Không có thông tin thanh toán",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey[600]),
+                                  )
+                                : Column(
+                                    children: _paymentContracts.map((payment) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _buildInfoRow(
+                                            "Số tiền thanh toán:",
+                                            payment.paymentAmount != null
+                                                ? "${formatCurrency(payment.paymentAmount!)} VND"
+                                                : "Không có thông tin",
+                                          ),
+                                          _buildInfoRow(
+                                            "Ngày thanh toán:",
+                                            (payment.paymentDate != null)
+                                                ? "${payment.paymentDate} "
+                                                : "Không có thông tin",
+                                          ),
+                                          _buildInfoRow(
+                                            "Thời hạn hợp đồng:",
+                                            (payment.startDateString != null &&
+                                                    payment.endDateString !=
+                                                        null)
+                                                ? "${payment.startDateString} - ${payment.endDateString}"
+                                                : "Không có thông tin",
+                                          ),
+
+                                          // _buildInfoRow(
+                                          //   "Trạng thái:",
+                                          //   payment.status != null
+                                          //       ? _getPaymentStatusText(
+                                          //       payment.status!)
+                                          //       : "Không có thông tin",
+                                          // ),
+                                          SizedBox(height: 8),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
                   ],
                 ),
               ),
@@ -415,7 +463,7 @@ class _ListContractDetailScreenState extends State<ContractDetailScreen> {
               children: [
                 Text(title,
                     style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
                 Row(
                   children: [

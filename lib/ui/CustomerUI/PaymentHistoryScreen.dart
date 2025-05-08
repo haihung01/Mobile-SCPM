@@ -1,9 +1,11 @@
 import 'package:fe_capstone/service/data_service.dart';
+import 'package:fe_capstone/ui/CustomerUI/chat/WebView.dart';
 import 'package:fe_capstone/ui/PaymentHistoryDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:fe_capstone/models/payment_contract.dart';
 import 'package:fe_capstone/ui/components/bottomAppBar/CustomFooter.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentHistoryScreen extends StatefulWidget {
   @override
@@ -41,12 +43,15 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
           },
         ),
         title: Center(
-          child: Text(
-            'Lịch sử giao dịch',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 25),
+            child: Text(
+              'Lịch sử giao dịch',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
@@ -77,14 +82,26 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to chat screen if needed
+        onPressed: () async {
+          final prefs = await SharedPreferences.getInstance();
+          final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+          final customerId = isLoggedIn ? (prefs.getInt('ownerId') ?? 0) : 0;
+
+          final url =
+              'https://scpmbe-hrhheedhh7gmatev.southeastasia-01.azurewebsites.net/api/Customer/$customerId/chat';
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatWebViewScreen(url),
+            ),
+          );
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Image.network(
-            'https://static.vecteezy.com/system/resources/previews/005/064/963/non_2x/letter-p-alphabet-natural-green-icons-leaf-logo-free-vector.jpg',
+            'https://cdn-icons-png.flaticon.com/512/6066/6066674.png',
             width: 50,
             height: 50,
             fit: BoxFit.cover,
@@ -107,7 +124,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => PaymentHistoryDetail(
-                paymentContract: payment,
+              paymentContract: payment,
             ),
           ),
         );
@@ -131,7 +148,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -147,27 +164,30 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: 5),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hợp đồng #${payment.paymentContractId} - ${payment.note}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Mã thanh toán #${payment.paymentContractId}: ${payment.note}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.5,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        '${payment.paymentDate}',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
+                        SizedBox(height: 4),
+                        Text(
+                          '${payment.paymentDate}',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

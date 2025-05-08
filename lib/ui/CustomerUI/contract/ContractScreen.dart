@@ -116,7 +116,24 @@ class _ContractScreenState extends State<ContractScreen> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('Không có hợp đồng nào'));
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.network(
+                            'https://zencomex.com/assets/products/empty.png',
+                            width: 200,
+                            height: 200,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Chưa có hợp đồng !!!',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    );
                   } else {
                     final contracts = snapshot.data!;
                     return ListView.builder(
@@ -265,7 +282,7 @@ class _ContractScreenState extends State<ContractScreen> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          "Bãi ${contract.parkingSpaceName}",
+                          "Vị trí: ${contract.parkingSpaceName}",
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black54,

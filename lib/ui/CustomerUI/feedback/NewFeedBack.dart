@@ -2,8 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:fe_capstone/service/data_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class NewFeedbackScreen extends StatelessWidget {
+class NewFeedbackScreen extends StatefulWidget {
+  @override
+  _NewFeedbackScreenState createState() => _NewFeedbackScreenState();
+}
+
+class _NewFeedbackScreenState extends State<NewFeedbackScreen> {
   final TextEditingController feedbackController = TextEditingController();
+
+  @override
+  void dispose() {
+    feedbackController.dispose(); // Đừng quên dispose khi widget bị hủy
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +94,20 @@ class NewFeedbackScreen extends StatelessWidget {
                     onPressed: () async {
                       final message = feedbackController.text.trim();
                       if (message.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Vui lòng nhập nội dung')),
+                        await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Không thể gửi!'),
+                            content: const Text('Vui lòng nhập nội dung...'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
                         );
+
                         return;
                       }
 
@@ -105,9 +127,6 @@ class NewFeedbackScreen extends StatelessWidget {
                         final dataService = DataService();
                         await dataService.sendFeedback(customerId, message);
 
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   SnackBar(content: Text('Gửi phản hồi thành công')),
-                        // );
                         Navigator.pop(context);
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
