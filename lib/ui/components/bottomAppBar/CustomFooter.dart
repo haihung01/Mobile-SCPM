@@ -102,7 +102,7 @@ class CustomFooter extends StatelessWidget {
             _buildNavItem(Icons.home, "Trang chủ", 0, context),
             _buildNavItem(Icons.layers, "Hợp đồng", 1, context),
             const SizedBox(width: 40),
-            _buildNavItem(Icons.car_crash, "Quản lý xe", 2, context),
+            _buildNavItem(Icons.car_repair_sharp, "Quản lý xe", 2, context),
             _buildNavItem(Icons.feedback_sharp, "Phản hồi", 3, context),
           ],
         ),

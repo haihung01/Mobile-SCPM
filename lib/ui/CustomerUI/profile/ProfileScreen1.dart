@@ -207,11 +207,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           );
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Image.network(
-            'https://static.vecteezy.com/system/resources/previews/005/064/963/non_2x/letter-p-alphabet-natural-green-icons-leaf-logo-free-vector.jpg',
+            'https://cdn-icons-png.flaticon.com/512/6066/6066674.png',
             width: 50,
             height: 50,
             fit: BoxFit.cover,

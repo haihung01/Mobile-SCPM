@@ -105,126 +105,29 @@ class _HomeScreenState extends State<HomeScreen1> {
             ),
           ),
         ),
-        title: const Text(
-          "SCPM",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+        title: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'SC',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextSpan(
+                text: 'PM',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20, top: 10),
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text(
-                        'Thông báo',
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900),
-                        textAlign: TextAlign.center,
-                      ),
-                      content: SizedBox(
-                        width: double.maxFinite,
-                        height: 400,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe BMW 320i',
-                                paymentTime: '20/04/2025',
-                                isPaid: true,
-                              ),
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe Mercedes GLC',
-                                paymentTime: '18/04/2025',
-                                isPaid: false,
-                              ),
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe VinFast VF8',
-                                paymentTime: '15/04/2025',
-                                isPaid: true,
-                              ),
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe Toyota Vios',
-                                paymentTime: '10/04/2025',
-                                isPaid: false,
-                              ),
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe VinFast VF8',
-                                paymentTime: '15/04/2025',
-                                isPaid: true,
-                              ),
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe BMW 320i',
-                                paymentTime: '20/04/2025',
-                                isPaid: true,
-                              ),
-                              _buildNotificationCard(
-                                contractName: 'Hợp Đồng Xe Mercedes GLC',
-                                paymentTime: '18/04/2025',
-                                isPaid: false,
-                              ),
-                              // Có thể thêm bao nhiêu cũng được ở đây
-                            ],
-                          ),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text('Đóng'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: Stack(
-                children: [
-                  const Icon(
-                    Icons.notifications_none,
-                    color: Color.fromARGB(255, 235, 110, 101),
-                    size: 35,
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 5,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '2',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -381,11 +284,11 @@ class _HomeScreenState extends State<HomeScreen1> {
             ),
           );
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Image.network(
-            'https://static.vecteezy.com/system/resources/previews/005/064/963/non_2x/letter-p-alphabet-natural-green-icons-leaf-logo-free-vector.jpg',
+            'https://cdn-icons-png.flaticon.com/512/6066/6066674.png',
             width: 50,
             height: 50,
             fit: BoxFit.cover,
