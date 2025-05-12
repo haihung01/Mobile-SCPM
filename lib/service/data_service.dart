@@ -24,7 +24,6 @@ class DataService {
 
   Future<List<ParkingLot>> searchParkingLots() async {
     try {
-      final customerId = await getCustomerId();
       print('[API] Calling: ${BaseConstants.BASE_URL}/ParkingLot/Search');
 
       final response = await _dio.post(
@@ -35,7 +34,7 @@ class DataService {
             'Accept': 'application/json',
           },
         ),
-        data: {"keyword": "", "customerId": customerId},
+        data: {"keyword": ""},
       );
 
       if (response.statusCode == 200) {

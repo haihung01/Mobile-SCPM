@@ -36,6 +36,7 @@ class _ContractScreenState extends State<LocationScreen> {
 
   Future<void> _loadParkingLots() async {
     final parkingLots = await _dataService.searchParkingLots();
+    print("Data parking: $parkingLots");
     setState(() {
       parkingList = parkingLots;
     });
