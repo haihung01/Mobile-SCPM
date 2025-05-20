@@ -346,7 +346,7 @@ class _ContractScreenState extends State<LocationScreen> {
               child: VietmapGL(
                 myLocationEnabled: true,
                 styleString:
-                '${BaseConstants.VIETMAP_URL}/maps/light/styles.json?apikey=${BaseConstants.VIET_MAP_APIKEY}',
+                    '${BaseConstants.VIETMAP_URL}/maps/light/styles.json?apikey=${BaseConstants.VIET_MAP_APIKEY}',
                 trackCameraPosition: true,
                 onMapCreated: _onMapCreated,
                 compassEnabled: false,
@@ -366,7 +366,7 @@ class _ContractScreenState extends State<LocationScreen> {
                     target: LatLng(10.739031, 106.680524), zoom: 14),
                 onMapClick: (point, coordinates) async {
                   var data =
-                  await _mapController?.queryRenderedFeatures(point: point);
+                      await _mapController?.queryRenderedFeatures(point: point);
                 },
               ),
             ),
@@ -389,7 +389,7 @@ class _ContractScreenState extends State<LocationScreen> {
             right: 0,
             child: Container(
               padding:
-              EdgeInsets.fromLTRB(14 * fem, 52 * fem, 14 * fem, 10 * fem),
+                  EdgeInsets.fromLTRB(14 * fem, 52 * fem, 14 * fem, 10 * fem),
               width: double.infinity,
               height: 120 * fem,
               decoration: BoxDecoration(
@@ -438,6 +438,43 @@ class _ContractScreenState extends State<LocationScreen> {
                       ),
                     ],
                   ),
+                  Positioned(
+                    top: 110,
+                    left: 16,
+                    right: 16,
+                    child: Material(
+                      elevation: 4,
+                      borderRadius: BorderRadius.circular(12),
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            performAutoSearch(value);
+                            setState(() {
+                              showSearchResults = true;
+                            });
+                          } else {
+                            setState(() {
+                              showSearchResults = false;
+                            });
+                          }
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Tìm kiếm địa chỉ (Vietmap)...',
+                          prefixIcon: Icon(Icons.search),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -448,45 +485,45 @@ class _ContractScreenState extends State<LocationScreen> {
             right: 0,
             child: showSearchResults
                 ? Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16 * fem),
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: 50 * fem,
-                  maxHeight: 220 * fem,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12 * fem),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
+                    padding: EdgeInsets.symmetric(horizontal: 16 * fem),
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight: 50 * fem,
+                        maxHeight: 220 * fem,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12 * fem),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: autoSearchResults.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(autoSearchResults[index]['name']),
+                            subtitle: Text(autoSearchResults[index]['address']),
+                            onTap: () {
+                              var selectedResult =
+                                  autoSearchResults[index]['ref_id'];
+                              getLatAndLong(selectedResult);
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              setState(() {
+                                showSearchResults = false;
+                              });
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ],
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  itemCount: autoSearchResults.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(autoSearchResults[index]['name']),
-                      subtitle: Text(autoSearchResults[index]['address']),
-                      onTap: () {
-                        var selectedResult =
-                        autoSearchResults[index]['ref_id'];
-                        getLatAndLong(selectedResult);
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        setState(() {
-                          showSearchResults = false;
-                        });
-                      },
-                    );
-                  },
-                ),
-              ),
-            )
+                  )
                 : SizedBox.shrink(),
           ),
         ],

@@ -275,11 +275,19 @@ class _ListParkingScreenState extends State<ListParkingScreen> {
                       items: cars.map((car) {
                         return DropdownMenuItem<Car>(
                           value: car,
-                          child: Text(
-                            car.licensePlate.isNotEmpty
-                                ? car.licensePlate
-                                : 'Xe không biển số',
-                            style: TextStyle(fontSize: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${car.brand} ${car.model}',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              Text(
+                                  car.licensePlate.isNotEmpty
+                                      ? car.licensePlate
+                                      : 'Xe không biển số',
+                                  style: TextStyle(fontSize: 14)),
+                            ],
                           ),
                         );
                       }).toList(),
