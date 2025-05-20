@@ -3,7 +3,6 @@ import 'package:fe_capstone/constant/base_constant.dart';
 import 'package:fe_capstone/main.dart';
 import 'package:fe_capstone/models/parking_lot_model.dart';
 import 'package:fe_capstone/service/data_service.dart';
-import 'package:fe_capstone/ui/CustomerUI/parking-management/ListParkingScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -36,24 +35,10 @@ class _ContractScreenState extends State<LocationScreen> {
 
   Future<void> _loadParkingLots() async {
     final parkingLots = await _dataService.searchParkingLots();
+    print("Data parking: $parkingLots");
     setState(() {
       parkingList = parkingLots;
     });
-  }
-
-  String _formatPrice(double price) {
-    String priceStr = price.toStringAsFixed(0);
-    String result = '';
-    int count = 0;
-
-    for (int i = priceStr.length - 1; i >= 0; i--) {
-      count++;
-      result = priceStr[i] + result;
-      if (count % 3 == 0 && i > 0) {
-        result = '.' + result;
-      }
-    }
-    return result;
   }
 
   @override
@@ -132,49 +117,47 @@ class _ContractScreenState extends State<LocationScreen> {
 
   Marker _buildParkingMarker(ParkingLot parking) {
     return Marker(
-      alignment: Alignment.center,
-      width: 60,
-      height: 60,
+      alignment: Alignment.bottomCenter,
+      width: 80,
+      height: 80,
       child: GestureDetector(
         onTap: () {
           _showParkingInfoDialog(parking);
         },
-        child: Stack(
-          alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Positioned(
-              bottom: 0,
+            Container(
+              width: 50,
+              height: 50,
               child: Icon(
                 Icons.local_parking_outlined,
                 color: Colors.green,
                 size: 40,
               ),
             ),
-            Positioned(
-              top: 0,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    )
-                  ],
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  )
+                ],
+              ),
+              child: Text(
+                parking.address,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-                child: Text(
-                  parking.address,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -188,97 +171,38 @@ class _ContractScreenState extends State<LocationScreen> {
   }
 
   void _showParkingInfoDialog(ParkingLot parking) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.45,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+      builder: (context) => AlertDialog(
+        title: Text(parking.address),
+        content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 5,
-                width: 40,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              Row(
-                children: [
-                  Icon(Icons.location_on, color: Colors.redAccent, size: 28),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      parking.address,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              Divider(color: Colors.grey.shade300),
-              SizedBox(height: 10),
-              _infoRow(Icons.attach_money, 'Giá theo giờ',
-                  '${_formatPrice(parking.pricePerHour ?? 0)} VND'),
-              _infoRow(Icons.calendar_today, 'Giá theo ngày',
-                  '${_formatPrice(parking.pricePerDay ?? 0)} VND'),
-              _infoRow(Icons.calendar_month, 'Giá theo tháng',
-                  '${_formatPrice(parking.pricePerMonth ?? 0)} VND'),
-              Spacer(),
-              SizedBox(
-                height: 38,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 32),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text("Đóng", style: TextStyle(fontSize: 15)),
-                ),
-              ),
+              _buildInfoRow(Icons.location_on, parking.address),
+              _buildInfoRow(Icons.attach_money, '${parking.pricePerMonth} VND'),
             ],
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Đóng'),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(IconData icon, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.blueGrey),
-          SizedBox(width: 12),
-          Text(
-            "$label:",
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-          ),
+          Icon(icon, size: 16, color: Colors.blue),
           SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 15, color: Colors.black87),
-            ),
-          ),
+          Expanded(child: Text(text)),
         ],
       ),
     );
@@ -336,7 +260,7 @@ class _ContractScreenState extends State<LocationScreen> {
       body: Stack(
         children: [
           Positioned(
-            top: 120 * fem,
+            top: 150 * fem,
             left: 0,
             right: 0,
             bottom: 0,
@@ -372,7 +296,7 @@ class _ContractScreenState extends State<LocationScreen> {
           ),
           if (_mapController != null)
             Positioned(
-              top: 200 * fem,
+              top: 150 * fem,
               left: 0,
               right: 0,
               bottom: 0,
@@ -388,92 +312,120 @@ class _ContractScreenState extends State<LocationScreen> {
             right: 0,
             child: Container(
               padding:
-                  EdgeInsets.fromLTRB(14 * fem, 52 * fem, 14 * fem, 10 * fem),
+                  EdgeInsets.fromLTRB(14 * fem, 62 * fem, 14 * fem, 26 * fem),
               width: double.infinity,
-              height: 120 * fem,
+              height: 150 * fem,
               decoration: BoxDecoration(
-                color: Colors.green.shade600,
+                color: Colors.green,
                 borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(24 * fem),
-                  bottomLeft: Radius.circular(24 * fem),
+                  bottomRight: Radius.circular(23 * fem),
+                  bottomLeft: Radius.circular(23 * fem),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    offset: Offset(0, 4),
-                    blurRadius: 10,
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      SizedBox(width: 8 * fem),
-                      Text(
-                        'Quay lại',
-                        style: TextStyle(
-                          fontSize: 30 * ffem,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(1, 1),
-                              blurRadius: 2,
-                              color: Colors.black26,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    top: 110,
-                    left: 16,
-                    right: 16,
-                    child: Material(
-                      elevation: 4,
-                      borderRadius: BorderRadius.circular(12),
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            performAutoSearch(value);
-                            setState(() {
-                              showSearchResults = true;
-                            });
-                          } else {
-                            setState(() {
-                              showSearchResults = false;
-                            });
-                          }
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Tìm kiếm địa chỉ (Vietmap)...',
-                          prefixIcon: Icon(Icons.search),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+                  Container(
+                    margin: EdgeInsets.fromLTRB(
+                        0 * fem, 0 * fem, 0 * fem, 30 * fem),
+                    width: double.infinity,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.fromLTRB(
+                              0 * fem, 0 * fem, 200.88 * fem, 0 * fem),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: Colors.white,
+                                  size: 24 * fem,
+                                ),
+                              ),
+                              SizedBox(width: 8 * fem),
+                              Text(
+                                'Quay lại',
+                                style: TextStyle(
+                                  fontSize: 30 * ffem,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2175 * ffem / fem,
+                                  fontStyle: FontStyle.italic,
+                                  color: Color(0xffffffff),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
+                  // Container(
+                  //   margin:
+                  //       EdgeInsets.fromLTRB(2 * fem, 0 * fem, 0 * fem, 0 * fem),
+                  //   padding: EdgeInsets.fromLTRB(
+                  //       19 * fem, 0 * fem, 14 * fem, 0 * fem),
+                  //   decoration: BoxDecoration(
+                  //     color: Color(0xffffffff),
+                  //     borderRadius: BorderRadius.circular(9 * fem),
+                  //   ),
+                  //   child: Row(
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Container(
+                  //         height: 46 * fem,
+                  //         width: 280 * fem,
+                  //         child: TextFormField(
+                  //           controller: _searchController,
+                  //           focusNode: _searchFocusNode,
+                  //           maxLines: 1,
+                  //           decoration: InputDecoration(
+                  //             hintText: 'Bạn muốn đi đến đâu?',
+                  //             border: InputBorder.none,
+                  //           ),
+                  //           onChanged: (value) async {
+                  //             if (!canPerformSearch) {
+                  //               return;
+                  //             }
+                  //             performAutoSearch(value);
+                  //             setState(() {
+                  //               showSearchResults = true;
+                  //             });
+                  //           },
+                  //         ),
+                  //       ),
+                  //       Container(
+                  //         margin: EdgeInsets.fromLTRB(
+                  //             0 * fem, 0 * fem, 9 * fem, 0 * fem),
+                  //         width: 1 * fem,
+                  //         height: 46 * fem,
+                  //         decoration: BoxDecoration(
+                  //           color: Color(0x7f000000),
+                  //         ),
+                  //       ),
+                  //       InkWell(
+                  //         onTap: () async {
+                  //           performAutoSearch(_searchController.text);
+                  //           setState(() {
+                  //             showSearchResults = true;
+                  //           });
+                  //         },
+                  //         child: Container(
+                  //           width: 16 * fem,
+                  //           height: 16 * fem,
+                  //           child: Icon(
+                  //             Icons.search,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             ),
