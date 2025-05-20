@@ -183,7 +183,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         _infoTile('Màu sắc', car.color),
         // _infoTile('Ngày đăng ký', car.registedDate),
         // _infoTile('Trạng thái', car.status ? 'Hoạt động' : 'Không hoạt động'),
-        _infoTile('Mô tả', car.color),
+        // _infoTile('Mô tả', car.color),
         if (car.entrance != null) ...[
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
